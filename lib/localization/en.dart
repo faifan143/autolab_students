@@ -34,6 +34,15 @@ const Map<String, String> enTranslations = {
   'watch_live_stream': 'Watch Live Stream',
   'watching_live_stream_of_session':
       'Watching live stream of session',
+  'connecting': 'Connecting...',
+  'waiting_for_stream': 'Waiting for stream to start...',
+  'receiving_stream': 'Receiving stream offer...',
+  'stream_connected': 'Stream connected',
+  'stream_ended': 'Stream ended',
+  'connection_error': 'Connection error',
+  'stream_not_available': 'Stream is not available',
+  'live_stream_placeholder': 'Live Stream\n(Placeholder Video Player)',
+  'reconnect': 'Reconnect',
 
   // Attendance
   'scan_qr': 'Scan QR',

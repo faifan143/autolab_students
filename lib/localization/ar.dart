@@ -33,6 +33,15 @@ const Map<String, String> arTranslations = {
   // Streaming
   'watch_live_stream': 'مشاهدة البث المباشر',
   'watching_live_stream_of_session': 'مشاهدة البث المباشر للجلسة',
+  'connecting': 'جاري الاتصال...',
+  'waiting_for_stream': 'في انتظار بدء البث...',
+  'receiving_stream': 'استقبال عرض البث...',
+  'stream_connected': 'تم الاتصال بالبث',
+  'stream_ended': 'انتهى البث',
+  'connection_error': 'خطأ في الاتصال',
+  'stream_not_available': 'البث غير متاح',
+  'live_stream_placeholder': 'بث مباشر\n(مشغل فيديو تجريبي)',
+  'reconnect': 'إعادة الاتصال',
 
   // Attendance
   'scan_qr': 'مسح رمز QR',
