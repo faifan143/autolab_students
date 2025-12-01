@@ -42,3 +42,19 @@ android {
 flutter {
     source = "../.."
 }
+
+configurations.all {
+    resolutionStrategy {
+        // Substitute missing camera-core-1.3.3 with available version
+        eachDependency {
+            if (requested.group == "androidx.camera" && requested.name == "camera-core" && requested.version == "1.3.3") {
+                useVersion("1.3.4")
+                because("Version 1.3.3 not available, using 1.3.4")
+            }
+            if (requested.group == "androidx.camera" && requested.name == "camera-camera2" && requested.version == "1.3.3") {
+                useVersion("1.3.4")
+                because("Version 1.3.3 not available, using 1.3.4")
+            }
+        }
+    }
+}

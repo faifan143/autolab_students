@@ -27,8 +27,8 @@ dependencies:
   flutter_secure_storage: ^9.2.2
   shared_preferences: ^2.3.2
 
-  # QR scanner
-  mobile_scanner: ^5.2.3
+  # QR scanner - Updated to fix camera dependency issues
+  mobile_scanner: ^7.1.3
 
   # URL launcher
   url_launcher: ^6.3.0
