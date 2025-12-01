@@ -114,6 +114,13 @@ const Map<String, String> enTranslations = {
   'loading': 'Loading...',
   'no_data': 'No data available',
   'retry': 'Retry',
+  'checking_authentication': 'Checking authentication...',
+  
+  // Token expiration
+  'token_expired': 'Session expired',
+  'token_refresh_failed': 'Failed to refresh session. Please login again.',
+  'session_expired_message': 'Your session has expired. Please login again.',
+  'refreshing_token': 'Refreshing session...',
 };
 
 

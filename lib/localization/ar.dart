@@ -113,6 +113,13 @@ const Map<String, String> arTranslations = {
   'loading': 'جاري التحميل...',
   'no_data': 'لا توجد بيانات',
   'retry': 'إعادة المحاولة',
+  'checking_authentication': 'جارٍ التحقق من المصادقة...',
+  
+  // Token expiration
+  'token_expired': 'انتهت الجلسة',
+  'token_refresh_failed': 'فشل تحديث الجلسة. يرجى تسجيل الدخول مرة أخرى.',
+  'session_expired_message': 'انتهت جلستك. يرجى تسجيل الدخول مرة أخرى.',
+  'refreshing_token': 'جارٍ تحديث الجلسة...',
 };
 
 

@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import '../constants/api_endpoints.dart';
 import '../routes/app_routes.dart';
 import 'storage_service.dart';
+import 'auth_service.dart';
+import '../utils/jwt_utils.dart';
 
 /// Core API service with Dio, token refresh, and 401 auto-logout
 class ApiService {
@@ -27,27 +29,73 @@ class ApiService {
       },
     ));
 
-    // Auth interceptor - adds token to requests
+    // Auth interceptor - validates token and adds to requests
     _dio!.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
-        final token = await StorageService.getAccessToken();
-        if (token != null) {
-          options.headers['Authorization'] = 'Bearer $token';
+        // Skip token validation for refresh endpoint to avoid recursion
+        if (options.path == ApiEndpoints.refresh) {
+          handler.next(options);
+          return;
+        }
+
+        // Check and refresh token before making request if needed
+        final accessToken = await StorageService.getAccessToken();
+        if (accessToken != null) {
+          // Check if token is expired or will expire soon
+          if (JwtUtils.isTokenExpired(accessToken) || 
+              JwtUtils.willExpireSoon(accessToken)) {
+            // Try to refresh token before making the request
+            if (!_isRefreshing) {
+              _isRefreshing = true;
+              try {
+                final refreshed = await AuthService.refreshAccessToken();
+                if (!refreshed) {
+                  // Refresh failed - logout
+                  _isRefreshing = false;
+                  await _logout();
+                  return handler.reject(
+                    DioException(
+                      requestOptions: options,
+                      error: 'Token refresh failed',
+                    ),
+                  );
+                }
+              } catch (e) {
+                _isRefreshing = false;
+                await _logout();
+                return handler.reject(
+                  DioException(
+                    requestOptions: options,
+                    error: 'Token refresh error: $e',
+                  ),
+                );
+              }
+              _isRefreshing = false;
+            }
+          }
+
+          // Get the (possibly refreshed) token
+          final token = await StorageService.getAccessToken();
+          if (token != null) {
+            options.headers['Authorization'] = 'Bearer $token';
+          }
         }
         handler.next(options);
       },
       onError: (error, handler) async {
         if (error.response?.statusCode == 401) {
-          // Try to refresh token
+          // Try to refresh token on 401 error
           if (!_isRefreshing) {
             _isRefreshing = true;
             try {
-              final refreshed = await _refreshToken();
+              final refreshed = await AuthService.refreshAccessToken();
               if (refreshed) {
-                // Retry original request
+                // Retry original request with new token
                 final opts = error.requestOptions;
                 final token = await StorageService.getAccessToken();
-                opts.headers['Authorization'] = 'Bearer $token';
+                if (token != null) {
+                  opts.headers['Authorization'] = 'Bearer $token';
+                }
                 final response = await _dio!.fetch(opts);
                 _isRefreshing = false;
                 return handler.resolve(response);
@@ -62,33 +110,25 @@ class ApiService {
               _isRefreshing = false;
               return handler.next(error);
             }
+          } else {
+            // Already refreshing, wait a bit and retry
+            await Future.delayed(const Duration(milliseconds: 500));
+            final token = await StorageService.getAccessToken();
+            if (token != null) {
+              final opts = error.requestOptions;
+              opts.headers['Authorization'] = 'Bearer $token';
+              try {
+                final response = await _dio!.fetch(opts);
+                return handler.resolve(response);
+              } catch (e) {
+                return handler.next(error);
+              }
+            }
           }
         }
         handler.next(error);
       },
     ));
-  }
-
-  static Future<bool> _refreshToken() async {
-    try {
-      final refreshToken = await StorageService.getRefreshToken();
-      if (refreshToken == null) return false;
-
-      final response = await _dio!.post(
-        ApiEndpoints.refresh,
-        data: {'refreshToken': refreshToken},
-      );
-
-      if (response.statusCode == 200) {
-        final data = response.data;
-        await StorageService.saveAccessToken(data['accessToken']);
-        await StorageService.saveRefreshToken(data['refreshToken']);
-        return true;
-      }
-      return false;
-    } catch (e) {
-      return false;
-    }
   }
 
   static Future<void> _logout() async {
