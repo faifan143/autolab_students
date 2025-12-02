@@ -4,6 +4,7 @@ import '../services/auth_service.dart';
 import '../routes/app_routes.dart';
 import '../services/storage_service.dart';
 import '../utils/jwt_utils.dart';
+import '../services/firebase_notifications_service.dart';
 
 class AuthProvider extends ChangeNotifier {
   bool isLoading = false;
@@ -110,6 +111,18 @@ class AuthProvider extends ChangeNotifier {
       isTokenExpired = false;
       isLoading = false;
       notifyListeners();
+      
+      // Register FCM token after successful login
+      try {
+        final fcmToken = await FirebaseNotificationsService.getToken();
+        if (fcmToken != null) {
+          await FirebaseNotificationsService.registerFCMToken(fcmToken);
+        }
+      } catch (e) {
+        // Don't fail login if FCM registration fails
+        print('FCM token registration failed: $e');
+      }
+      
       return true;
     } catch (e) {
       error = e.toString();
@@ -136,6 +149,18 @@ class AuthProvider extends ChangeNotifier {
       isTokenExpired = false;
       isLoading = false;
       notifyListeners();
+      
+      // Register FCM token after successful registration
+      try {
+        final fcmToken = await FirebaseNotificationsService.getToken();
+        if (fcmToken != null) {
+          await FirebaseNotificationsService.registerFCMToken(fcmToken);
+        }
+      } catch (e) {
+        // Don't fail registration if FCM registration fails
+        print('FCM token registration failed: $e');
+      }
+      
       return true;
     } catch (e) {
       error = e.toString();

@@ -1,7 +1,10 @@
 import 'dart:convert';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:get/get.dart';
 import '../routes/app_routes.dart';
+import '../constants/api_endpoints.dart';
+import 'api_service.dart';
 
 /// Firebase Cloud Messaging service for handling push notifications
 class FirebaseNotificationsService {
@@ -63,17 +66,15 @@ class FirebaseNotificationsService {
       // Handle notification taps when app is in background
       FirebaseMessaging.onMessageOpenedApp.listen(_handleNotificationTap);
 
-      // Get FCM token
+      // Get FCM token and register with backend
       final token = await _firebaseMessaging.getToken();
       if (token != null) {
-        // TODO: Send token to backend for registration
-        print('FCM Token: $token');
+        await registerFCMToken(token);
       }
 
       // Listen for token refresh
-      _firebaseMessaging.onTokenRefresh.listen((newToken) {
-        // TODO: Update token on backend
-        print('New FCM Token: $newToken');
+      _firebaseMessaging.onTokenRefresh.listen((newToken) async {
+        await registerFCMToken(newToken);
       });
 
       _initialized = true;
@@ -146,28 +147,108 @@ class FirebaseNotificationsService {
   /// Navigate based on notification type
   static void _handleNotificationNavigation(Map<String, dynamic> data) {
     final type = data['type'] as String?;
+    final navigator = AppRoutes.navigatorKey.currentState;
+
+    if (navigator == null) return;
 
     switch (type) {
       case 'LAB_ENROLLMENT':
-        // Navigate to labs screen
-        AppRoutes.navigatorKey.currentState?.pushNamed(AppRoutes.labs);
+        // Navigate to labs screen and show success message
+        navigator.pushNamedAndRemoveUntil(
+          AppRoutes.labs,
+          (route) => route.settings.name == AppRoutes.home || route.isFirst,
+        );
+        // Show success message
+        Get.snackbar(
+          'enrollment_success'.tr,
+          'lab_enrollment_notification'.tr,
+          snackPosition: SnackPosition.TOP,
+          duration: const Duration(seconds: 3),
+        );
         break;
+
       case 'SESSION_STARTED':
-      case 'SESSION_ENDED':
-        // Navigate to sessions screen
+        // Navigate to sessions screen with labId
         final labId = data['labId'] as String?;
         if (labId != null) {
-          AppRoutes.navigatorKey.currentState?.pushNamed(
+          navigator.pushNamed(
             AppRoutes.sessions,
             arguments: labId,
           );
         } else {
-          AppRoutes.navigatorKey.currentState?.pushNamed(AppRoutes.sessions);
+          navigator.pushNamed(AppRoutes.sessions);
+        }
+        // Show notification
+        Get.snackbar(
+          'session_started'.tr,
+          'session_started_notification'.tr,
+          snackPosition: SnackPosition.TOP,
+          duration: const Duration(seconds: 3),
+        );
+        break;
+
+      case 'SESSION_ENDED':
+        // Navigate to sessions screen with labId
+        final labId = data['labId'] as String?;
+        if (labId != null) {
+          navigator.pushNamed(
+            AppRoutes.sessions,
+            arguments: labId,
+          );
+        } else {
+          navigator.pushNamed(AppRoutes.sessions);
+        }
+        // Show notification
+        Get.snackbar(
+          'session_ended'.tr,
+          'session_ended_notification'.tr,
+          snackPosition: SnackPosition.TOP,
+          duration: const Duration(seconds: 3),
+        );
+        break;
+
+      case 'NEW_CHAT_MESSAGE':
+        // Navigate to chat screen with labId
+        final labId = data['labId'] as String?;
+        final senderName = data['senderName'] as String?;
+        final messageContent = data['message'] as String?;
+        if (labId != null) {
+          navigator.pushNamed(
+            AppRoutes.chat,
+            arguments: labId,
+          );
+          // Show message preview
+          if (senderName != null && messageContent != null) {
+            Get.snackbar(
+              senderName,
+              messageContent,
+              snackPosition: SnackPosition.TOP,
+              duration: const Duration(seconds: 2),
+            );
+          }
+        } else {
+          navigator.pushNamed(AppRoutes.home);
         }
         break;
+
       default:
         // Navigate to home
-        AppRoutes.navigatorKey.currentState?.pushNamed(AppRoutes.home);
+        navigator.pushNamed(AppRoutes.home);
+    }
+  }
+
+  /// Register FCM token with backend
+  static Future<void> registerFCMToken(String token) async {
+    try {
+      final dio = await ApiService.dio;
+      await dio.post(
+        ApiEndpoints.fcmToken,
+        data: {'fcmToken': token},
+      );
+      print('FCM token registered successfully: $token');
+    } catch (e) {
+      print('Failed to register FCM token: $e');
+      // Don't throw - allow app to continue even if token registration fails
     }
   }
 
@@ -178,8 +259,66 @@ class FirebaseNotificationsService {
 }
 
 /// Background message handler (must be top-level function)
+/// This handles notifications when app is terminated
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // Handle background message
+  // Initialize Firebase if not already initialized
+  // Note: Firebase.initializeApp() should be called in main.dart before this
+  
+  // Show local notification for background messages
+  final notification = message.notification;
+  final data = message.data;
+
+  if (notification != null) {
+    // Initialize local notifications plugin
+    final FlutterLocalNotificationsPlugin localNotifications =
+        FlutterLocalNotificationsPlugin();
+
+    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const iosSettings = DarwinInitializationSettings();
+    const initSettings = InitializationSettings(
+      android: androidSettings,
+      iOS: iosSettings,
+    );
+
+    await localNotifications.initialize(initSettings);
+
+    // Create notification channel for Android
+    const androidChannel = AndroidNotificationChannel(
+      'autolab_students_channel',
+      'AutoLab Notifications',
+      description: 'Notifications for lab enrollment, sessions, and updates',
+      importance: Importance.high,
+    );
+
+    await localNotifications
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(androidChannel);
+
+    // Show notification
+    const androidDetails = AndroidNotificationDetails(
+      'autolab_students_channel',
+      'AutoLab Notifications',
+      channelDescription: 'Notifications for lab enrollment, sessions, and updates',
+      importance: Importance.high,
+      priority: Priority.high,
+    );
+
+    const iosDetails = DarwinNotificationDetails();
+    const notificationDetails = NotificationDetails(
+      android: androidDetails,
+      iOS: iosDetails,
+    );
+
+    await localNotifications.show(
+      DateTime.now().millisecondsSinceEpoch.remainder(100000),
+      notification.title ?? 'AutoLab',
+      notification.body ?? '',
+      notificationDetails,
+      payload: jsonEncode(data),
+    );
+  }
+
   print('Handling background message: ${message.messageId}');
 }

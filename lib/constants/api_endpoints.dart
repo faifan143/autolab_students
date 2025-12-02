@@ -37,4 +37,7 @@ class ApiEndpoints {
 
   // Streaming (student only watches, no start/stop)
   static String sessionStream(String sessionId) => '/sessions/$sessionId';
+
+  // FCM Token
+  static const String fcmToken = '/students/fcm-token';
 }

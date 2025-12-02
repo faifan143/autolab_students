@@ -163,6 +163,14 @@ const Map<String, String> arTranslations = {
   'token_refresh_failed': 'فشل تحديث الجلسة. يرجى تسجيل الدخول مرة أخرى.',
   'session_expired_message': 'انتهت جلستك. يرجى تسجيل الدخول مرة أخرى.',
   'refreshing_token': 'جارٍ تحديث الجلسة...',
+  
+  // Notification messages
+  'lab_enrollment_notification': 'تم تسجيلك بنجاح في المعمل',
+  'session_started': 'بدأت الجلسة',
+  'session_started_notification': 'بدأت جلسة معمل',
+  'session_ended': 'انتهت الجلسة',
+  'session_ended_notification': 'انتهت جلسة معمل',
+  'new_message': 'رسالة جديدة',
 };
 
 

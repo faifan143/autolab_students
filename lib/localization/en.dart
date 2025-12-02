@@ -163,6 +163,14 @@ const Map<String, String> enTranslations = {
   'token_refresh_failed': 'Failed to refresh session. Please login again.',
   'session_expired_message': 'Your session has expired. Please login again.',
   'refreshing_token': 'Refreshing session...',
+  
+  // Notification messages
+  'lab_enrollment_notification': 'You have been successfully enrolled in the lab',
+  'session_started': 'Session Started',
+  'session_started_notification': 'A lab session has started',
+  'session_ended': 'Session Ended',
+  'session_ended_notification': 'A lab session has ended',
+  'new_message': 'New Message',
 };
 
 
