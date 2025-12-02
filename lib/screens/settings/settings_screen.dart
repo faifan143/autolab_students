@@ -36,10 +36,7 @@ class SettingsScreen extends StatelessWidget {
                   onPressed: () => Get.back(),
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  'settings'.tr,
-                  style: theme.textTheme.titleMedium,
-                ),
+                Text('settings'.tr, style: theme.textTheme.titleMedium),
               ],
             ),
             const SizedBox(height: 8),
@@ -47,7 +44,18 @@ class SettingsScreen extends StatelessWidget {
             const SizedBox(height: 16),
             Text('account_section'.tr, style: theme.textTheme.titleSmall),
             const SizedBox(height: 8),
-            Card(
+            Container(
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surface,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: theme.shadowColor.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
               child: Column(
                 children: [
                   ListTile(
@@ -62,20 +70,15 @@ class SettingsScreen extends StatelessWidget {
                       leading: const Icon(Icons.language),
                       title: Text('language'.tr),
                       subtitle: Text(
-                        localeController.locale.value.languageCode.toUpperCase(),
+                        localeController.locale.value.languageCode
+                            .toUpperCase(),
                       ),
                       trailing: DropdownButton<String>(
                         value: localeController.locale.value.languageCode,
                         underline: const SizedBox.shrink(),
                         items: const [
-                          DropdownMenuItem(
-                            value: 'en',
-                            child: Text('EN'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'ar',
-                            child: Text('AR'),
-                          ),
+                          DropdownMenuItem(value: 'en', child: Text('EN')),
+                          DropdownMenuItem(value: 'ar', child: Text('AR')),
                         ],
                         onChanged: (code) {
                           if (code != null) {
@@ -91,7 +94,18 @@ class SettingsScreen extends StatelessWidget {
             const SizedBox(height: 16),
             Text('app_section'.tr, style: theme.textTheme.titleSmall),
             const SizedBox(height: 8),
-            Card(
+            Container(
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surface,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: theme.shadowColor.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
               child: Column(
                 children: [
                   Obx(
@@ -108,7 +122,8 @@ class SettingsScreen extends StatelessWidget {
                             : 'theme_light'.tr,
                       ),
                       trailing: Switch(
-                        value: themeController.themeMode.value == ThemeMode.dark,
+                        value:
+                            themeController.themeMode.value == ThemeMode.dark,
                         onChanged: (_) => themeController.toggleTheme(),
                       ),
                     ),
@@ -137,7 +152,18 @@ class SettingsScreen extends StatelessWidget {
             const SizedBox(height: 16),
             Text('about_section'.tr, style: theme.textTheme.titleSmall),
             const SizedBox(height: 8),
-            Card(
+            Container(
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surface,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: theme.shadowColor.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
               child: Column(
                 children: [
                   ListTile(
@@ -206,15 +232,9 @@ class _ProfileHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  name,
-                  style: theme.textTheme.titleMedium,
-                ),
+                Text(name, style: theme.textTheme.titleMedium),
                 if (email.isNotEmpty)
-                  Text(
-                    email,
-                    style: theme.textTheme.bodySmall,
-                  ),
+                  Text(email, style: theme.textTheme.bodySmall),
                 Text(
                   'role_student'.tr,
                   style: theme.textTheme.bodySmall?.copyWith(
@@ -242,9 +262,7 @@ class _LogoutButton extends StatelessWidget {
         backgroundColor: AppColors.error,
         foregroundColor: Colors.white,
         minimumSize: const Size.fromHeight(48),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
       icon: const Icon(Icons.logout),
       label: Text('logout'.tr),
@@ -271,9 +289,7 @@ class _LogoutButton extends StatelessWidget {
                 ),
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(true),
-                  style: TextButton.styleFrom(
-                    foregroundColor: AppColors.error,
-                  ),
+                  style: TextButton.styleFrom(foregroundColor: AppColors.error),
                   child: Text('logout'.tr),
                 ),
               ],
