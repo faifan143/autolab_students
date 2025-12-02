@@ -4,6 +4,14 @@ const Map<String, String> arTranslations = {
   'ok': 'حسناً',
   'cancel': 'إلغاء',
   'error': 'خطأ',
+  'success': 'نجح',
+  'loading': 'جاري التحميل...',
+  'no_data': 'لا توجد بيانات',
+  'retry': 'إعادة المحاولة',
+
+  // Roles / labels
+  'student': 'طالب',
+  'role_student': 'طالب',
 
   // Auth
   'login': 'تسجيل الدخول',
@@ -12,9 +20,24 @@ const Map<String, String> arTranslations = {
   'password': 'كلمة المرور',
   'name': 'الاسم',
   'logout': 'تسجيل الخروج',
+  'app_subtitle_students': 'بوابة الطالب للمعامل والجلسات والدرجات',
+  'sign_in_title': 'تسجيل الدخول',
+  'sign_in_subtitle': 'الوصول إلى المعامل والجلسات والتقدم الدراسي',
+  'email_required': 'البريد الإلكتروني مطلوب',
+  'email_invalid': 'يرجى إدخال بريد إلكتروني صالح',
+  'password_required': 'كلمة المرور مطلوبة',
+  'password_too_short': 'يجب أن تكون كلمة المرور 6 أحرف على الأقل',
+  'forgot_password': 'هل نسيت كلمة المرور؟',
+  'no_account_register': 'ليس لديك حساب؟ أنشئ حساباً',
+  'register_subtitle_students': 'انضم إلى الدورات والمعامل في أوتولاب',
+  'create_account_title': 'إنشاء حساب',
+  'create_account_subtitle': 'سجل كطالب للوصول إلى معاملك',
+  'name_required': 'الاسم مطلوب',
+  'already_have_account_login': 'لديك حساب بالفعل؟ سجّل الدخول',
 
   // Home
   'home_dashboard': 'الصفحة الرئيسية',
+  'home': 'الرئيسية',
   'my_labs': 'معاملي',
   'sessions': 'الجلسات',
   'attendance': 'الحضور',
@@ -22,6 +45,11 @@ const Map<String, String> arTranslations = {
   'files': 'الملفات',
   'chat': 'المحادثة',
   'settings': 'الإعدادات',
+  'see_all': 'عرض الكل',
+  'greeting_generic': 'مرحباً بعودتك',
+  'today_overview': 'اليوم',
+  'today_overview_subtitle': 'اطّلع على الجلسات القادمة وآخر الأنشطة',
+  'tap_to_open': 'اضغط للفتح',
 
   // Settings
   'theme': 'السمة',
@@ -29,6 +57,17 @@ const Map<String, String> arTranslations = {
   'server_ip': 'عنوان الخادم',
   'light': 'فاتح',
   'dark': 'داكن',
+  'theme_light': 'سمة فاتحة',
+  'theme_dark': 'سمة داكنة',
+  'account_section': 'الحساب',
+  'app_section': 'التطبيق',
+  'about_section': 'حول',
+  'profile_details': 'بيانات الملف الشخصي',
+  'about_app': 'حول التطبيق',
+  'about_app_description': 'تطبيق أوتولاب للطلاب يساعدك على متابعة المعامل والجلسات والدرجات.',
+  'privacy_policy': 'سياسة الخصوصية',
+  'logout_title': 'تسجيل الخروج؟',
+  'logout_message': 'سيتم تسجيل خروجك من هذا الجهاز.',
 
   // Streaming
   'watch_live_stream': 'مشاهدة البث المباشر',
@@ -62,8 +101,9 @@ const Map<String, String> arTranslations = {
   // IP config
   'configure_server_ip': 'إعداد عنوان الخادم',
   'server_configuration': 'إعدادات الخادم',
+  'server_configuration_description':
+      'سيتم استخدام هذا العنوان لجميع طلبات الـ API واتصالات WebSocket.',
   'server_config_saved': 'تم حفظ إعدادات الخادم بنجاح',
-  'success': 'نجح',
   'ip_segment_1': 'الجزء الأول من IP',
   'ip_segment_2': 'الجزء الثاني من IP',
   'ip_segment_3': 'الجزء الثالث من IP',
@@ -109,10 +149,7 @@ const Map<String, String> arTranslations = {
   'no_messages': 'لا توجد رسائل بعد',
   'chat_history': 'سجل المحادثة',
   
-  // General
-  'loading': 'جاري التحميل...',
-  'no_data': 'لا توجد بيانات',
-  'retry': 'إعادة المحاولة',
+  // General / auth status
   'checking_authentication': 'جارٍ التحقق من المصادقة...',
   
   // Token expiration
