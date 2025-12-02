@@ -19,88 +19,113 @@ class SessionDetailScreen extends StatelessWidget {
     });
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('session_details'.tr),
-      ),
-      body: sessionsProvider.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : sessionsProvider.currentSession == null
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('no_data'.tr),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: () => sessionsProvider.loadSession(sessionId),
-                        child: Text('retry'.tr),
-                      ),
-                    ],
-                  ),
-                )
-              : Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _InfoRow(
-                        label: 'start_time'.tr,
-                        value: DateFormat('MMM dd, yyyy HH:mm').format(
-                          sessionsProvider.currentSession!.startTime,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: sessionsProvider.isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : sessionsProvider.currentSession == null
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.arrow_back),
+                              onPressed: () => Get.back(),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'session_details'.tr,
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                          ],
                         ),
-                      ),
-                      if (sessionsProvider.currentSession!.endTime != null)
-                        _InfoRow(
-                          label: 'end_time'.tr,
-                          value: DateFormat('MMM dd, yyyy HH:mm').format(
-                            sessionsProvider.currentSession!.endTime!,
-                          ),
-                        ),
-                      _InfoRow(
-                        label: 'streaming'.tr,
-                        value: sessionsProvider.currentSession!.isStreaming
-                            ? 'streaming'.tr
-                            : 'not_streaming'.tr,
-                      ),
-                      if (sessionsProvider.currentSession!.recordedVideoUrl !=
-                          null) ...[
+                        const SizedBox(height: 32),
+                        Text('no_data'.tr),
                         const SizedBox(height: 16),
-                        Text(
-                          'recorded_video'.tr,
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        const SizedBox(height: 8),
-                        ElevatedButton.icon(
-                          onPressed: () async {
-                            final url = Uri.parse(
-                              sessionsProvider.currentSession!.recordedVideoUrl!,
-                            );
-                            if (await canLaunchUrl(url)) {
-                              await launchUrl(url);
-                            }
-                          },
-                          icon: const Icon(Icons.play_circle),
-                          label: Text('watch_live_stream'.tr),
+                        ElevatedButton(
+                          onPressed: () => sessionsProvider.loadSession(sessionId),
+                          child: Text('retry'.tr),
                         ),
                       ],
-                      const Spacer(),
-                      if (sessionsProvider.currentSession!.isStreaming)
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton.icon(
-                            onPressed: () {
-                              Get.toNamed(
-                                AppRoutes.sessionStreaming,
-                                arguments: sessionId,
-                              );
-                            },
-                            icon: const Icon(Icons.live_tv),
-                            label: Text('watch_live_stream'.tr),
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.arrow_back),
+                              onPressed: () => Get.back(),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'session_details'.tr,
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        _InfoRow(
+                          label: 'start_time'.tr,
+                          value: DateFormat('MMM dd, yyyy HH:mm').format(
+                            sessionsProvider.currentSession!.startTime,
                           ),
                         ),
-                    ],
-                  ),
-                ),
+                        if (sessionsProvider.currentSession!.endTime != null)
+                          _InfoRow(
+                            label: 'end_time'.tr,
+                            value: DateFormat('MMM dd, yyyy HH:mm').format(
+                              sessionsProvider.currentSession!.endTime!,
+                            ),
+                          ),
+                        _InfoRow(
+                          label: 'streaming'.tr,
+                          value: sessionsProvider.currentSession!.isStreaming
+                              ? 'streaming'.tr
+                              : 'not_streaming'.tr,
+                        ),
+                        if (sessionsProvider.currentSession!.recordedVideoUrl !=
+                            null) ...[
+                          const SizedBox(height: 16),
+                          Text(
+                            'recorded_video'.tr,
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          const SizedBox(height: 8),
+                          ElevatedButton.icon(
+                            onPressed: () async {
+                              final url = Uri.parse(
+                                sessionsProvider.currentSession!.recordedVideoUrl!,
+                              );
+                              if (await canLaunchUrl(url)) {
+                                await launchUrl(url);
+                              }
+                            },
+                            icon: const Icon(Icons.play_circle),
+                            label: Text('watch_live_stream'.tr),
+                          ),
+                        ],
+                        const Spacer(),
+                        if (sessionsProvider.currentSession!.isStreaming)
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              onPressed: () {
+                                Get.toNamed(
+                                  AppRoutes.sessionStreaming,
+                                  arguments: sessionId,
+                                );
+                              },
+                              icon: const Icon(Icons.live_tv),
+                              label: Text('watch_live_stream'.tr),
+                            ),
+                          ),
+                      ],
+                    ),
+        ),
+      ),
     );
   }
 }

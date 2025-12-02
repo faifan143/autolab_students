@@ -25,124 +25,139 @@ class SettingsScreen extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('settings'.tr),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          _ProfileHeader(theme: theme),
-          const SizedBox(height: 16),
-          Text('account_section'.tr, style: theme.textTheme.titleSmall),
-          const SizedBox(height: 8),
-          Card(
-            child: Column(
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            Row(
               children: [
-                ListTile(
-                  leading: const Icon(Icons.person_outline),
-                  title: Text('profile_details'.tr),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () {},
+                IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () => Get.back(),
                 ),
-                const Divider(height: 1),
-                Obx(
-                  () => ListTile(
-                    leading: const Icon(Icons.language),
-                    title: Text('language'.tr),
-                    subtitle: Text(localeController.locale.value.languageCode.toUpperCase()),
-                    trailing: DropdownButton<String>(
-                      value: localeController.locale.value.languageCode,
-                      underline: const SizedBox.shrink(),
-                      items: const [
-                        DropdownMenuItem(
-                          value: 'en',
-                          child: Text('EN'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'ar',
-                          child: Text('AR'),
-                        ),
-                      ],
-                      onChanged: (code) {
-                        if (code != null) {
-                          localeController.changeLocale(code);
-                        }
-                      },
+                const SizedBox(width: 8),
+                Text(
+                  'settings'.tr,
+                  style: theme.textTheme.titleMedium,
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            _ProfileHeader(theme: theme),
+            const SizedBox(height: 16),
+            Text('account_section'.tr, style: theme.textTheme.titleSmall),
+            const SizedBox(height: 8),
+            Card(
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.person_outline),
+                    title: Text('profile_details'.tr),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () {},
+                  ),
+                  const Divider(height: 1),
+                  Obx(
+                    () => ListTile(
+                      leading: const Icon(Icons.language),
+                      title: Text('language'.tr),
+                      subtitle: Text(
+                        localeController.locale.value.languageCode.toUpperCase(),
+                      ),
+                      trailing: DropdownButton<String>(
+                        value: localeController.locale.value.languageCode,
+                        underline: const SizedBox.shrink(),
+                        items: const [
+                          DropdownMenuItem(
+                            value: 'en',
+                            child: Text('EN'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'ar',
+                            child: Text('AR'),
+                          ),
+                        ],
+                        onChanged: (code) {
+                          if (code != null) {
+                            localeController.changeLocale(code);
+                          }
+                        },
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          Text('app_section'.tr, style: theme.textTheme.titleSmall),
-          const SizedBox(height: 8),
-          Card(
-            child: Column(
-              children: [
-                Obx(
-                  () => ListTile(
-                    leading: Icon(
-                      themeController.themeMode.value == ThemeMode.dark
-                          ? Icons.dark_mode_outlined
-                          : Icons.light_mode_outlined,
-                    ),
-                    title: Text('theme'.tr),
-                    subtitle: Text(
-                      themeController.themeMode.value == ThemeMode.dark
-                          ? 'theme_dark'.tr
-                          : 'theme_light'.tr,
-                    ),
-                    trailing: Switch(
-                      value: themeController.themeMode.value == ThemeMode.dark,
-                      onChanged: (_) => themeController.toggleTheme(),
+            const SizedBox(height: 16),
+            Text('app_section'.tr, style: theme.textTheme.titleSmall),
+            const SizedBox(height: 8),
+            Card(
+              child: Column(
+                children: [
+                  Obx(
+                    () => ListTile(
+                      leading: Icon(
+                        themeController.themeMode.value == ThemeMode.dark
+                            ? Icons.dark_mode_outlined
+                            : Icons.light_mode_outlined,
+                      ),
+                      title: Text('theme'.tr),
+                      subtitle: Text(
+                        themeController.themeMode.value == ThemeMode.dark
+                            ? 'theme_dark'.tr
+                            : 'theme_light'.tr,
+                      ),
+                      trailing: Switch(
+                        value: themeController.themeMode.value == ThemeMode.dark,
+                        onChanged: (_) => themeController.toggleTheme(),
+                      ),
                     ),
                   ),
-                ),
-                const Divider(height: 1),
-                FutureBuilder<String>(
-                  future: _getServerInfo(),
-                  builder: (context, snapshot) {
-                    return ListTile(
-                      leading: const Icon(Icons.dns_outlined),
-                      title: Text('server_ip'.tr),
-                      subtitle: Text(snapshot.data ?? 'loading'.tr),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () {
-                        showDialog(
-                          context: context,
-                          builder: (_) => const IpConfigDialog(),
-                        );
-                      },
-                    );
-                  },
-                ),
-              ],
+                  const Divider(height: 1),
+                  FutureBuilder<String>(
+                    future: _getServerInfo(),
+                    builder: (context, snapshot) {
+                      return ListTile(
+                        leading: const Icon(Icons.dns_outlined),
+                        title: Text('server_ip'.tr),
+                        subtitle: Text(snapshot.data ?? 'loading'.tr),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (_) => const IpConfigDialog(),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          Text('about_section'.tr, style: theme.textTheme.titleSmall),
-          const SizedBox(height: 8),
-          Card(
-            child: Column(
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.info_outline),
-                  title: Text('about_app'.tr),
-                  subtitle: Text('about_app_description'.tr),
-                ),
-                const Divider(height: 1),
-                ListTile(
-                  leading: const Icon(Icons.privacy_tip_outlined),
-                  title: Text('privacy_policy'.tr),
-                  onTap: () {},
-                ),
-              ],
+            const SizedBox(height: 16),
+            Text('about_section'.tr, style: theme.textTheme.titleSmall),
+            const SizedBox(height: 8),
+            Card(
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.info_outline),
+                    title: Text('about_app'.tr),
+                    subtitle: Text('about_app_description'.tr),
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: const Icon(Icons.privacy_tip_outlined),
+                    title: Text('privacy_policy'.tr),
+                    onTap: () {},
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 24),
-          _LogoutButton(theme: theme),
-        ],
+            const SizedBox(height: 24),
+            _LogoutButton(theme: theme),
+          ],
+        ),
       ),
     );
   }
@@ -163,16 +178,21 @@ class _ProfileHeader extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        gradient: const LinearGradient(
-          colors: [AppColors.primary, AppColors.primaryDark],
-        ),
+        boxShadow: [
+          BoxShadow(
+            color: theme.shadowColor.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Row(
         children: [
           CircleAvatar(
             radius: 24,
-            backgroundColor: Colors.white,
+            backgroundColor: AppColors.primarySoft,
             child: Text(
               name.isNotEmpty ? name[0].toUpperCase() : '?',
               style: const TextStyle(
@@ -188,21 +208,17 @@ class _ProfileHeader extends StatelessWidget {
               children: [
                 Text(
                   name,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: Colors.white,
-                  ),
+                  style: theme.textTheme.titleMedium,
                 ),
                 if (email.isNotEmpty)
                   Text(
                     email,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: Colors.white70,
-                    ),
+                    style: theme.textTheme.bodySmall,
                   ),
                 Text(
                   'role_student'.tr,
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: Colors.white70,
+                    color: theme.textTheme.bodySmall?.color?.withOpacity(0.8),
                   ),
                 ),
               ],

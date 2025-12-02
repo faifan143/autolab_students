@@ -18,49 +18,72 @@ class FilesListScreen extends StatelessWidget {
     });
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('files'.tr),
-      ),
-      body: filesProvider.isLoading && filesProvider.files.isEmpty
-          ? const Center(child: CircularProgressIndicator())
-          : filesProvider.files.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('no_files'.tr),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: () => filesProvider.loadFiles(),
-                        child: Text('retry'.tr),
-                      ),
-                    ],
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    onPressed: () => Get.back(),
                   ),
-                )
-              : RefreshIndicator(
-                  onRefresh: () => filesProvider.loadFiles(),
-                  child: ListView.builder(
-                    itemCount: filesProvider.files.length,
-                    itemBuilder: (context, index) {
-                      final file = filesProvider.files[index];
-                      return Card(
-                        margin: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        child: ListTile(
-                          leading: const Icon(Icons.insert_drive_file),
-                          title: Text(file.fileName),
-                          subtitle: Text(
-                            '${_formatFileSize(file.size)} • ${DateFormat('MMM dd, yyyy').format(file.createdAt)}',
+                  const SizedBox(width: 8),
+                  Text(
+                    'files'.tr,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: filesProvider.isLoading && filesProvider.files.isEmpty
+                  ? const Center(child: CircularProgressIndicator())
+                  : filesProvider.files.isEmpty
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text('no_files'.tr),
+                              const SizedBox(height: 16),
+                              ElevatedButton(
+                                onPressed: () => filesProvider.loadFiles(),
+                                child: Text('retry'.tr),
+                              ),
+                            ],
                           ),
-                          trailing: const Icon(Icons.arrow_forward_ios),
-                          onTap: () => _showFileDetails(context, file, filesProvider),
+                        )
+                      : RefreshIndicator(
+                          onRefresh: () => filesProvider.loadFiles(),
+                          child: ListView.builder(
+                            itemCount: filesProvider.files.length,
+                            itemBuilder: (context, index) {
+                              final file = filesProvider.files[index];
+                              return Card(
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 8,
+                                ),
+                                child: ListTile(
+                                  leading: const Icon(Icons.insert_drive_file),
+                                  title: Text(file.fileName),
+                                  subtitle: Text(
+                                    '${_formatFileSize(file.size)} • ${DateFormat('MMM dd, yyyy').format(file.createdAt)}',
+                                  ),
+                                  trailing: const Icon(Icons.arrow_forward_ios),
+                                  onTap: () =>
+                                      _showFileDetails(context, file, filesProvider),
+                                ),
+                              );
+                            },
+                          ),
                         ),
-                      );
-                    },
-                  ),
-                ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

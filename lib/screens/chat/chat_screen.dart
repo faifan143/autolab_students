@@ -64,47 +64,63 @@ class _ChatScreenState extends State<ChatScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text('chat'.tr)),
-      body: Column(
-        children: [
-          Expanded(
-            child: chatProvider.isLoading && chatProvider.messages.isEmpty
-                ? const Center(child: CircularProgressIndicator())
-                : chatProvider.messages.isEmpty
-                ? Center(child: Text('no_messages'.tr))
-                : ListView.builder(
-                    controller: _scrollController,
-                    padding: const EdgeInsets.all(8),
-                    itemCount: chatProvider.messages.length,
-                    itemBuilder: (context, index) {
-                      final message = chatProvider.messages[index];
-                      return _ChatBubble(message: message);
-                    },
+      body: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    onPressed: () => Get.back(),
                   ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _messageController,
-                    decoration: InputDecoration(
-                      hintText: 'type_message'.tr,
-                      border: const OutlineInputBorder(),
-                    ),
-                    onSubmitted: (_) => _sendMessage(),
+                  const SizedBox(width: 8),
+                  Text(
+                    'chat'.tr,
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
-                ),
-                const SizedBox(width: 8),
-                IconButton(
-                  icon: const Icon(Icons.send),
-                  onPressed: _sendMessage,
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+            Expanded(
+              child: chatProvider.isLoading && chatProvider.messages.isEmpty
+                  ? const Center(child: CircularProgressIndicator())
+                  : chatProvider.messages.isEmpty
+                      ? Center(child: Text('no_messages'.tr))
+                      : ListView.builder(
+                          controller: _scrollController,
+                          padding: const EdgeInsets.all(8),
+                          itemCount: chatProvider.messages.length,
+                          itemBuilder: (context, index) {
+                            final message = chatProvider.messages[index];
+                            return _ChatBubble(message: message);
+                          },
+                        ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _messageController,
+                      decoration: InputDecoration(
+                        hintText: 'type_message'.tr,
+                      ),
+                      onSubmitted: (_) => _sendMessage(),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    icon: const Icon(Icons.send),
+                    onPressed: _sendMessage,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -17,69 +17,89 @@ class AttendanceScreen extends StatelessWidget {
     });
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('attendance'.tr),
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () async {
-                  await Get.toNamed(AppRoutes.qrScanner);
-                  attendanceProvider.loadAttendance();
-                },
-                icon: const Icon(Icons.qr_code_scanner),
-                label: Text('scan_qr'.tr),
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    onPressed: () => Get.back(),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'attendance'.tr,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ],
               ),
             ),
-          ),
-          Expanded(
-            child: attendanceProvider.isLoading &&
-                    attendanceProvider.attendanceHistory.isEmpty
-                ? const Center(child: CircularProgressIndicator())
-                : attendanceProvider.attendanceHistory.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text('no_data'.tr),
-                            const SizedBox(height: 16),
-                            ElevatedButton(
-                              onPressed: () => attendanceProvider.loadAttendance(),
-                              child: Text('retry'.tr),
-                            ),
-                          ],
-                        ),
-                      )
-                    : RefreshIndicator(
-                        onRefresh: () => attendanceProvider.loadAttendance(),
-                        child: ListView.builder(
-                          itemCount: attendanceProvider.attendanceHistory.length,
-                          itemBuilder: (context, index) {
-                            final attendance =
-                                attendanceProvider.attendanceHistory[index];
-                            return Card(
-                              margin: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 8,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () async {
+                    await Get.toNamed(AppRoutes.qrScanner);
+                    attendanceProvider.loadAttendance();
+                  },
+                  icon: const Icon(Icons.qr_code_scanner),
+                  label: Text('scan_qr'.tr),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Expanded(
+              child: attendanceProvider.isLoading &&
+                      attendanceProvider.attendanceHistory.isEmpty
+                  ? const Center(child: CircularProgressIndicator())
+                  : attendanceProvider.attendanceHistory.isEmpty
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text('no_data'.tr),
+                              const SizedBox(height: 16),
+                              ElevatedButton(
+                                onPressed: () =>
+                                    attendanceProvider.loadAttendance(),
+                                child: Text('retry'.tr),
                               ),
-                              child: ListTile(
-                                title: Text(
-                                  DateFormat('MMM dd, yyyy HH:mm')
-                                      .format(attendance.timestamp),
+                            ],
+                          ),
+                        )
+                      : RefreshIndicator(
+                          onRefresh: () => attendanceProvider.loadAttendance(),
+                          child: ListView.builder(
+                            itemCount:
+                                attendanceProvider.attendanceHistory.length,
+                            itemBuilder: (context, index) {
+                              final attendance =
+                                  attendanceProvider.attendanceHistory[index];
+                              return Card(
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 8,
                                 ),
-                                subtitle: Text(_getStatusText(attendance.status)),
-                                trailing: _getStatusIcon(attendance.status),
-                              ),
-                            );
-                          },
+                                child: ListTile(
+                                  title: Text(
+                                    DateFormat('MMM dd, yyyy HH:mm')
+                                        .format(attendance.timestamp),
+                                  ),
+                                  subtitle:
+                                      Text(_getStatusText(attendance.status)),
+                                  trailing: _getStatusIcon(attendance.status),
+                                ),
+                              );
+                            },
+                          ),
                         ),
-                      ),
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }
