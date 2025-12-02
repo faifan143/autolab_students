@@ -1,14 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import '../../models/lab_model.dart';
 import '../../routes/app_routes.dart';
+import '../../providers/labs_provider.dart';
 
 class LabDetailScreen extends StatelessWidget {
   const LabDetailScreen({super.key});
 
+  Future<void> _handleEnroll(BuildContext context, String labId) async {
+    final labsProvider = context.read<LabsProvider>();
+    final success = await labsProvider.enrollInLab(labId);
+
+    if (context.mounted) {
+      if (success) {
+        Get.snackbar(
+          'success'.tr,
+          'enrollment_success'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green.withOpacity(0.8),
+          colorText: Colors.white,
+        );
+        Get.back(); // Return to labs list
+      } else {
+        Get.snackbar(
+          'error'.tr,
+          labsProvider.error ?? 'enrollment_error'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red.withOpacity(0.8),
+          colorText: Colors.white,
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final lab = Get.arguments as LabModel;
+    final labsProvider = context.watch<LabsProvider>();
+    final isEnrolled = labsProvider.labs.any((l) => l.id == lab.id);
 
     return Scaffold(
       body: SafeArea(
@@ -50,19 +80,55 @@ class LabDetailScreen extends StatelessWidget {
                 Text(lab.description!),
               ],
               const Spacer(),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    Get.toNamed(
-                      AppRoutes.sessions,
-                      arguments: lab.id,
-                    );
-                  },
-                  icon: const Icon(Icons.event_outlined),
-                  label: Text('view_sessions'.tr),
+              if (!isEnrolled)
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: labsProvider.isEnrolling
+                        ? null
+                        : () => _handleEnroll(context, lab.id),
+                    icon: labsProvider.isEnrolling
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.add_circle_outline),
+                    label: Text(labsProvider.isEnrolling
+                        ? 'enrolling'.tr
+                        : 'enroll'.tr),
+                  ),
                 ),
-              ),
+              if (!isEnrolled) const SizedBox(height: 12),
+              if (isEnrolled) ...[
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Get.toNamed(
+                        AppRoutes.sessions,
+                        arguments: lab.id,
+                      );
+                    },
+                    icon: const Icon(Icons.event_outlined),
+                    label: Text('view_sessions'.tr),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      Get.toNamed(
+                        AppRoutes.chat,
+                        arguments: lab.id,
+                      );
+                    },
+                    icon: const Icon(Icons.chat_bubble_outline),
+                    label: Text('chat'.tr),
+                  ),
+                ),
+              ],
             ],
           ),
         ),

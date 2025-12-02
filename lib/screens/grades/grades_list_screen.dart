@@ -76,8 +76,15 @@ class GradesListScreen extends StatelessWidget {
                                   isThreeLine: grade.comment != null,
                                   onTap: grade.comment != null
                                       ? () {
+                                          final theme = Theme.of(context);
                                           Get.dialog(
                                             AlertDialog(
+                                              backgroundColor:
+                                                  theme.colorScheme.surface,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(16),
+                                              ),
                                               title: Text('comment'.tr),
                                               content: Text(grade.comment!),
                                               actions: [

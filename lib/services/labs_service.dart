@@ -11,5 +11,11 @@ class LabsService {
     final List<dynamic> data = response.data;
     return data.map((json) => LabModel.fromJson(json)).toList();
   }
+
+  /// Enroll student in a lab
+  static Future<void> enrollInLab(String labId) async {
+    final dio = await ApiService.dio;
+    await dio.post(ApiEndpoints.enrollInLab(labId));
+  }
 }
 

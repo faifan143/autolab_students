@@ -271,6 +271,7 @@ class _LogoutButton extends StatelessWidget {
           context: context,
           builder: (context) {
             return AlertDialog(
+              backgroundColor: theme.colorScheme.surface,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),

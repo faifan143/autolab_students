@@ -95,6 +95,10 @@ class _IpConfigDialogState extends State<IpConfigDialog> {
     final theme = Theme.of(context);
 
     return AlertDialog(
+      backgroundColor: theme.colorScheme.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
       title: Text('server_configuration'.tr),
       content: Column(
         mainAxisSize: MainAxisSize.min,

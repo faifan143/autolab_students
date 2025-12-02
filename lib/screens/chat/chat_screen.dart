@@ -20,9 +20,13 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
-    // TODO: Get labId from arguments or context
-    // For now, using a placeholder - in real app, this should come from navigation
-    _labId = Get.arguments as String? ?? 'default-lab-id';
+    // Get labId from navigation arguments
+    _labId = Get.arguments as String?;
+    if (_labId == null) {
+      // If no labId provided, try to get from home screen context
+      // For now, show error if no labId
+      _labId = null;
+    }
   }
 
   @override
@@ -84,19 +88,39 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
             ),
             Expanded(
-              child: chatProvider.isLoading && chatProvider.messages.isEmpty
-                  ? const Center(child: CircularProgressIndicator())
-                  : chatProvider.messages.isEmpty
-                      ? Center(child: Text('no_messages'.tr))
-                      : ListView.builder(
-                          controller: _scrollController,
-                          padding: const EdgeInsets.all(8),
-                          itemCount: chatProvider.messages.length,
-                          itemBuilder: (context, index) {
-                            final message = chatProvider.messages[index];
-                            return _ChatBubble(message: message);
-                          },
-                        ),
+              child: _labId == null
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                          const SizedBox(height: 16),
+                          Text(
+                            'chat_no_lab_selected'.tr,
+                            style: Theme.of(context).textTheme.bodyLarge,
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 16),
+                          ElevatedButton(
+                            onPressed: () => Get.back(),
+                            child: Text('go_back'.tr),
+                          ),
+                        ],
+                      ),
+                    )
+                  : chatProvider.isLoading && chatProvider.messages.isEmpty
+                      ? const Center(child: CircularProgressIndicator())
+                      : chatProvider.messages.isEmpty
+                          ? Center(child: Text('no_messages'.tr))
+                          : ListView.builder(
+                              controller: _scrollController,
+                              padding: const EdgeInsets.all(8),
+                              itemCount: chatProvider.messages.length,
+                              itemBuilder: (context, index) {
+                                final message = chatProvider.messages[index];
+                                return _ChatBubble(message: message);
+                              },
+                            ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),

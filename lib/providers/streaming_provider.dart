@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 import '../models/session_model.dart';
 import '../services/streaming_service.dart';
+import '../services/webrtc_service.dart';
 
 class StreamingProvider extends ChangeNotifier {
   bool isLoading = false;
@@ -12,6 +14,7 @@ class StreamingProvider extends ChangeNotifier {
   bool hasReceivedOffer = false;
   Map<String, dynamic>? streamOffer;
   String? connectionStatus;
+  RTCVideoRenderer? remoteRenderer;
 
   /// Load streaming status and initialize WebSocket connection
   Future<void> loadStreamingStatus(String sessionId) async {
@@ -43,23 +46,36 @@ class StreamingProvider extends ChangeNotifier {
   /// Initialize WebSocket connection and listen for streamOffer
   Future<void> _initializeStreamingConnection(String sessionId) async {
     try {
-      // Set callback for stream offer
-      StreamingService.setOnStreamOfferReceived((data) {
-        if (data['type'] == 'streamEnd') {
-          // Stream ended
-          hasReceivedOffer = false;
-          isConnected = false;
-          connectionStatus = 'stream_ended'.tr;
-          notifyListeners();
-        } else {
-          // Received stream offer
-          _handleStreamOffer(data);
-        }
+      // Initialize WebRTC peer connection
+      await WebRTCService.initializePeerConnection();
+
+      // Initialize video renderer
+      remoteRenderer = await WebRTCService.initializeRenderer();
+
+      // Set callbacks
+      WebRTCService.setOnRemoteStreamReady((renderer) {
+        remoteRenderer = renderer;
+        hasReceivedOffer = true;
+        isConnected = true;
+        connectionStatus = 'stream_connected'.tr;
+        notifyListeners();
       });
 
-      // Initialize socket connection
-      await StreamingService.initializeStreamingSocket(sessionId);
-      
+      WebRTCService.setOnConnectionStateChanged((state) {
+        connectionStatus = state;
+        isConnected = state == 'RTCPeerConnectionStateConnected';
+        notifyListeners();
+      });
+
+      WebRTCService.setOnError((errorMsg) {
+        error = errorMsg;
+        connectionStatus = 'connection_error'.tr;
+        notifyListeners();
+      });
+
+      // Initialize WebSocket signaling
+      await WebRTCService.initializeSignaling(sessionId);
+
       connectionStatus = 'waiting_for_stream'.tr;
       notifyListeners();
     } catch (e) {
@@ -69,43 +85,19 @@ class StreamingProvider extends ChangeNotifier {
     }
   }
 
-  /// Handle incoming stream offer from teacher
-  void _handleStreamOffer(Map<String, dynamic> offerData) {
-    streamOffer = offerData;
-    hasReceivedOffer = true;
-    connectionStatus = 'receiving_stream'.tr;
-
-    // Mock WebRTC answer creation
-    // In a real implementation, this would create a proper WebRTC answer
-    final mockAnswer = {
-      'type': 'answer',
-      'sdp': 'mock-sdp-answer-${DateTime.now().millisecondsSinceEpoch}',
-      'sessionId': currentSession?.id,
-    };
-
-    // Send answer back to teacher
-    StreamingService.sendStreamAnswer(mockAnswer);
-
-    // Simulate connection establishment
-    Future.delayed(const Duration(seconds: 1), () {
-      isConnected = true;
-      connectionStatus = 'stream_connected'.tr;
-      notifyListeners();
-    });
-
-    notifyListeners();
-  }
-
   /// Manually reconnect to streaming
   Future<void> reconnect(String sessionId) async {
+    await WebRTCService.disconnect();
     hasReceivedOffer = false;
     isConnected = false;
     streamOffer = null;
+    remoteRenderer = null;
     await loadStreamingStatus(sessionId);
   }
 
   @override
   void dispose() {
+    WebRTCService.disconnect();
     StreamingService.disconnect();
     super.dispose();
   }

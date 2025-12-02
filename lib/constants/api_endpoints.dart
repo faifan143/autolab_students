@@ -10,6 +10,7 @@ class ApiEndpoints {
 
   // Student labs
   static const String studentLabs = '/students/labs';
+  static String enrollInLab(String labId) => '/students/labs/$labId/enroll';
 
   // Sessions
   static String labSessions(String labId) => '/labs/$labId/sessions';

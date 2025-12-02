@@ -116,6 +116,10 @@ const Map<String, String> arTranslations = {
   'view_sessions': 'عرض الجلسات',
   'teacher': 'المعلم',
   'description': 'الوصف',
+  'enroll': 'التسجيل',
+  'enrolling': 'جاري التسجيل...',
+  'enrollment_success': 'تم التسجيل في المعمل بنجاح',
+  'enrollment_error': 'فشل التسجيل في المعمل',
   
   // Sessions
   'session_details': 'تفاصيل الجلسة',
@@ -148,6 +152,8 @@ const Map<String, String> arTranslations = {
   // Chat
   'no_messages': 'لا توجد رسائل بعد',
   'chat_history': 'سجل المحادثة',
+  'chat_no_lab_selected': 'يرجى اختيار معمل لعرض المحادثة',
+  'go_back': 'رجوع',
   
   // General / auth status
   'checking_authentication': 'جارٍ التحقق من المصادقة...',

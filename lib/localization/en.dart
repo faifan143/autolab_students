@@ -116,6 +116,10 @@ const Map<String, String> enTranslations = {
   'view_sessions': 'View Sessions',
   'teacher': 'Teacher',
   'description': 'Description',
+  'enroll': 'Enroll',
+  'enrolling': 'Enrolling...',
+  'enrollment_success': 'Successfully enrolled in lab',
+  'enrollment_error': 'Failed to enroll in lab',
   
   // Sessions
   'session_details': 'Session Details',
@@ -148,6 +152,8 @@ const Map<String, String> enTranslations = {
   // Chat
   'no_messages': 'No messages yet',
   'chat_history': 'Chat History',
+  'chat_no_lab_selected': 'Please select a lab to view chat',
+  'go_back': 'Go Back',
   
   // General / auth status
   'checking_authentication': 'Checking authentication...',

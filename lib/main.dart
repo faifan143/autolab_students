@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 import 'routes/app_routes.dart';
 import 'theme/app_theme.dart';
@@ -15,9 +16,21 @@ import 'providers/grades_provider.dart';
 import 'providers/files_provider.dart';
 import 'providers/chat_provider.dart';
 import 'providers/streaming_provider.dart';
+import 'services/firebase_notifications_service.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Firebase
+  try {
+    await Firebase.initializeApp();
+    // Initialize FCM notifications
+    await FirebaseNotificationsService.initialize();
+  } catch (e) {
+    // Firebase initialization failed (e.g., missing google-services.json)
+    // App can still run without notifications
+    print('Firebase initialization failed: $e');
+  }
 
   // Initialize GetX controllers
   Get.put(ThemeController());

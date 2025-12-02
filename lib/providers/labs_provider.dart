@@ -4,6 +4,7 @@ import '../services/labs_service.dart';
 
 class LabsProvider extends ChangeNotifier {
   bool isLoading = false;
+  bool isEnrolling = false;
   String? error;
   List<LabModel> labs = [];
 
@@ -20,6 +21,26 @@ class LabsProvider extends ChangeNotifier {
       error = e.toString();
       isLoading = false;
       notifyListeners();
+    }
+  }
+
+  Future<bool> enrollInLab(String labId) async {
+    isEnrolling = true;
+    error = null;
+    notifyListeners();
+
+    try {
+      await LabsService.enrollInLab(labId);
+      // Reload labs to reflect enrollment
+      await loadLabs();
+      isEnrolling = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      error = e.toString();
+      isEnrolling = false;
+      notifyListeners();
+      return false;
     }
   }
 }

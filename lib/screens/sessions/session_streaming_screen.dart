@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 import '../../providers/streaming_provider.dart';
 
 class SessionStreamingScreen extends StatefulWidget {
@@ -176,7 +177,7 @@ class _SessionStreamingScreenState extends State<SessionStreamingScreen> {
           ),
         ),
 
-        // Placeholder video player
+        // Real WebRTC video player
         Expanded(
           child: Container(
             width: double.infinity,
@@ -184,33 +185,39 @@ class _SessionStreamingScreenState extends State<SessionStreamingScreen> {
             child: Stack(
               alignment: Alignment.center,
               children: [
-                // Placeholder video player UI
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.play_circle_outline,
-                      size: 80,
-                      color: Colors.white,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'live_stream_placeholder'.tr,
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            color: Colors.white,
-                          ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'watching_live_stream_of_session'.tr,
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.white70,
-                          ),
-                    ),
-                  ],
-                ),
+                // Real WebRTC video view
+                if (provider.remoteRenderer != null && provider.isConnected)
+                  RTCVideoView(
+                    provider.remoteRenderer!,
+                    mirror: false,
+                    objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
+                  )
+                else
+                  // Loading/placeholder while connecting
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const CircularProgressIndicator(color: Colors.white),
+                      const SizedBox(height: 16),
+                      Text(
+                        provider.hasReceivedOffer
+                            ? 'receiving_stream'.tr
+                            : 'waiting_for_stream'.tr,
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              color: Colors.white,
+                            ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'watching_live_stream_of_session'.tr,
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Colors.white70,
+                            ),
+                      ),
+                    ],
+                  ),
 
                 // Live indicator
                 Positioned(
