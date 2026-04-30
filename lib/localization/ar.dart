@@ -64,7 +64,8 @@ const Map<String, String> arTranslations = {
   'about_section': 'حول',
   'profile_details': 'بيانات الملف الشخصي',
   'about_app': 'حول التطبيق',
-  'about_app_description': 'تطبيق أوتولاب للطلاب يساعدك على متابعة المعامل والجلسات والدرجات.',
+  'about_app_description':
+      'تطبيق أوتولاب للطلاب يساعدك على متابعة المعامل والجلسات والدرجات.',
   'privacy_policy': 'سياسة الخصوصية',
   'logout_title': 'تسجيل الخروج؟',
   'logout_message': 'سيتم تسجيل خروجك من هذا الجهاز.',
@@ -93,8 +94,24 @@ const Map<String, String> arTranslations = {
   // Files
   'open_file': 'فتح الملف',
   'file_details': 'تفاصيل الملف',
+  'download_and_open': 'تحميل وفتح',
+  'downloading': 'جاري التحميل...',
+  'view_image': 'عرض الصورة',
+  'storage_permission_required': 'إذن التخزين مطلوب لتحميل الملفات',
+  'download_failed': 'فشل تحميل الملف',
+  'no_app_to_open_file': 'لا يوجد تطبيق لفتح هذا الملف',
+  'warning': 'تحذير',
+  'lab_not_found': 'معلومات المعمل غير موجودة',
 
   // Chat
+  'chat.title': 'الدردشة',
+  'chat.subtitle.lobby': 'دردشة مجتمع المعلمين',
+  'chat.empty': 'لا توجد رسائل بعد',
+  'chat.empty.subtitle': 'ابدأ المحادثة بإرسال رسالة',
+  'chat.error': 'فشل تحميل الرسائل',
+  'chat.input.hint': 'اكتب رسالة...',
+  'chat.send': 'إرسال',
+  'chat.attach.file': 'إرفاق ملف',
   'type_message': 'اكتب رسالة',
   'send': 'إرسال',
 
@@ -110,7 +127,7 @@ const Map<String, String> arTranslations = {
   'ip_segment_4': 'الجزء الرابع من IP',
   'port': 'المنفذ',
   'save': 'حفظ',
-  
+
   // Labs
   'lab_details': 'تفاصيل المعمل',
   'view_sessions': 'عرض الجلسات',
@@ -120,7 +137,9 @@ const Map<String, String> arTranslations = {
   'enrolling': 'جاري التسجيل...',
   'enrollment_success': 'تم التسجيل في المعمل بنجاح',
   'enrollment_error': 'فشل التسجيل في المعمل',
-  
+  'enrolled_labs': 'المعامل المسجلة',
+  'available_labs': 'المعامل المتاحة',
+
   // Sessions
   'session_details': 'تفاصيل الجلسة',
   'start_time': 'وقت البدء',
@@ -129,48 +148,54 @@ const Map<String, String> arTranslations = {
   'not_streaming': 'لا يوجد بث',
   'recorded_video': 'فيديو مسجل',
   'no_recorded_video': 'لا يوجد فيديو مسجل',
-  
+
   // Attendance
   'present': 'حاضر',
   'late': 'متأخر',
   'absent': 'غائب',
   'attendance_submitted': 'تم تسجيل الحضور بنجاح',
   'attendance_submit_error': 'فشل تسجيل الحضور',
-  
+
   // Grades
   'score': 'الدرجة',
   'max_score': 'الدرجة الكاملة',
   'percentage': 'النسبة المئوية',
   'comment': 'تعليق',
-  
+
   // Files
   'file_name': 'اسم الملف',
   'file_size': 'حجم الملف',
   'created_at': 'تاريخ الإنشاء',
   'no_files': 'لا توجد ملفات',
-  
+
   // Chat
   'no_messages': 'لا توجد رسائل بعد',
   'chat_history': 'سجل المحادثة',
   'chat_no_lab_selected': 'يرجى اختيار معمل لعرض المحادثة',
   'go_back': 'رجوع',
-  
+
   // General / auth status
   'checking_authentication': 'جارٍ التحقق من المصادقة...',
-  
+
   // Token expiration
   'token_expired': 'انتهت الجلسة',
   'token_refresh_failed': 'فشل تحديث الجلسة. يرجى تسجيل الدخول مرة أخرى.',
   'session_expired_message': 'انتهت جلستك. يرجى تسجيل الدخول مرة أخرى.',
   'refreshing_token': 'جارٍ تحديث الجلسة...',
-  
+
   // Notification messages
-  'lab_enrollment_notification': 'تم تسجيلك بنجاح في المعمل',
+  'enrollment_confirmed': 'تم تأكيد التسجيل',
+  'enrollment_confirmed_message': 'تم تسجيلك بنجاح في المعمل.',
+  'unenrollment_confirmed': 'تم تأكيد إلغاء التسجيل',
+  'unenrollment_confirmed_message': 'لقد تركت المعمل.',
+  'session_created': 'تم إنشاء جلسة جديدة',
+  'session_created_message': 'تم جدولة جلسة جديدة.',
   'session_started': 'بدأت الجلسة',
-  'session_started_notification': 'بدأت جلسة معمل',
+  'session_started_message': 'بدأت الجلسة.',
+  'session_updated': 'تم تحديث الجلسة',
+  'session_updated_message': 'تم تحديث تفاصيل الجلسة.',
   'session_ended': 'انتهت الجلسة',
-  'session_ended_notification': 'انتهت جلسة معمل',
+  'session_ended_message': 'انتهت الجلسة.',
   'new_message': 'رسالة جديدة',
+  'new_chat_message': 'رسالة محادثة جديدة.',
 };
-
-

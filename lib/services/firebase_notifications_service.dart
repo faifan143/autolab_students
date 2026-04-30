@@ -37,7 +37,7 @@ class FirebaseNotificationsService {
       );
 
       await _localNotifications.initialize(
-        initSettings,
+        settings: initSettings,
         onDidReceiveNotificationResponse: _onNotificationTapped,
       );
 
@@ -86,6 +86,7 @@ class FirebaseNotificationsService {
     final notification = message.notification;
     final data = message.data;
 
+    // Show local notification
     if (notification != null) {
       await _showLocalNotification(
         title: notification.title ?? 'AutoLab',
@@ -93,6 +94,10 @@ class FirebaseNotificationsService {
         data: data,
       );
     }
+
+    // Also handle navigation for foreground messages
+    // This allows immediate navigation when app is open
+    _handleNotificationNavigation(data);
   }
 
   /// Show local notification
@@ -118,10 +123,10 @@ class FirebaseNotificationsService {
     );
 
     await _localNotifications.show(
-      DateTime.now().millisecondsSinceEpoch.remainder(100000),
-      title,
-      body,
-      notificationDetails,
+      id: DateTime.now().millisecondsSinceEpoch.remainder(100000),
+      title: title,
+      body: body,
+      notificationDetails: notificationDetails,
       payload: jsonEncode(data),
     );
   }
@@ -160,8 +165,43 @@ class FirebaseNotificationsService {
         );
         // Show success message
         Get.snackbar(
-          'enrollment_success'.tr,
-          'lab_enrollment_notification'.tr,
+          'enrollment_confirmed'.tr,
+          'enrollment_confirmed_message'.tr,
+          snackPosition: SnackPosition.TOP,
+          duration: const Duration(seconds: 3),
+        );
+        break;
+
+      case 'LAB_UNENROLLMENT':
+        // Navigate to labs screen and show confirmation message
+        navigator.pushNamedAndRemoveUntil(
+          AppRoutes.labs,
+          (route) => route.settings.name == AppRoutes.home || route.isFirst,
+        );
+        // Show confirmation message
+        Get.snackbar(
+          'unenrollment_confirmed'.tr,
+          'unenrollment_confirmed_message'.tr,
+          snackPosition: SnackPosition.TOP,
+          duration: const Duration(seconds: 3),
+        );
+        break;
+
+      case 'SESSION_CREATED':
+        // Navigate to sessions screen with labId
+        final labId = data['labId'] as String?;
+        if (labId != null) {
+          navigator.pushNamed(
+            AppRoutes.sessions,
+            arguments: labId,
+          );
+        } else {
+          navigator.pushNamed(AppRoutes.sessions);
+        }
+        // Show notification
+        Get.snackbar(
+          'session_created'.tr,
+          'session_created_message'.tr,
           snackPosition: SnackPosition.TOP,
           duration: const Duration(seconds: 3),
         );
@@ -181,7 +221,27 @@ class FirebaseNotificationsService {
         // Show notification
         Get.snackbar(
           'session_started'.tr,
-          'session_started_notification'.tr,
+          'session_started_message'.tr,
+          snackPosition: SnackPosition.TOP,
+          duration: const Duration(seconds: 3),
+        );
+        break;
+
+      case 'SESSION_UPDATED':
+        // Navigate to sessions screen with labId
+        final labId = data['labId'] as String?;
+        if (labId != null) {
+          navigator.pushNamed(
+            AppRoutes.sessions,
+            arguments: labId,
+          );
+        } else {
+          navigator.pushNamed(AppRoutes.sessions);
+        }
+        // Show notification
+        Get.snackbar(
+          'session_updated'.tr,
+          'session_updated_message'.tr,
           snackPosition: SnackPosition.TOP,
           duration: const Duration(seconds: 3),
         );
@@ -201,31 +261,36 @@ class FirebaseNotificationsService {
         // Show notification
         Get.snackbar(
           'session_ended'.tr,
-          'session_ended_notification'.tr,
+          'session_ended_message'.tr,
           snackPosition: SnackPosition.TOP,
           duration: const Duration(seconds: 3),
         );
         break;
 
-      case 'NEW_CHAT_MESSAGE':
+      case 'CHAT_MESSAGE':
+      case 'NEW_CHAT_MESSAGE': // Support both for backward compatibility
         // Navigate to chat screen with labId
         final labId = data['labId'] as String?;
         final senderName = data['senderName'] as String?;
-        final messageContent = data['message'] as String?;
+        final messageContent = data['content'] as String? ?? data['message'] as String?;
+        final labName = data['labName'] as String?;
+        // Note: messageId, senderId available in data but not used for navigation
+        
         if (labId != null) {
           navigator.pushNamed(
             AppRoutes.chat,
             arguments: labId,
           );
-          // Show message preview
-          if (senderName != null && messageContent != null) {
-            Get.snackbar(
-              senderName,
-              messageContent,
-              snackPosition: SnackPosition.TOP,
-              duration: const Duration(seconds: 2),
-            );
-          }
+          // Show message preview with sender name and lab name
+          final title = senderName != null && labName != null
+              ? '$senderName in $labName'
+              : senderName ?? labName ?? 'new_message'.tr;
+          Get.snackbar(
+            title,
+            messageContent ?? 'new_chat_message'.tr,
+            snackPosition: SnackPosition.TOP,
+            duration: const Duration(seconds: 2),
+          );
         } else {
           navigator.pushNamed(AppRoutes.home);
         }
@@ -281,7 +346,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
       iOS: iosSettings,
     );
 
-    await localNotifications.initialize(initSettings);
+    await localNotifications.initialize(settings: initSettings);
 
     // Create notification channel for Android
     const androidChannel = AndroidNotificationChannel(
@@ -312,10 +377,10 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     );
 
     await localNotifications.show(
-      DateTime.now().millisecondsSinceEpoch.remainder(100000),
-      notification.title ?? 'AutoLab',
-      notification.body ?? '',
-      notificationDetails,
+      id: DateTime.now().millisecondsSinceEpoch.remainder(100000),
+      title: notification.title ?? 'AutoLab',
+      body: notification.body ?? '',
+      notificationDetails: notificationDetails,
       payload: jsonEncode(data),
     );
   }

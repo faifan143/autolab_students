@@ -7,21 +7,35 @@ part of 'file_model.dart';
 // **************************************************************************
 
 FileModel _$FileModelFromJson(Map<String, dynamic> json) => FileModel(
-      id: json['id'] as String,
-      fileName: json['fileName'] as String,
-      size: (json['size'] as num).toInt(),
-      labId: json['labId'] as String,
-      sessionId: json['sessionId'] as String?,
-      ownerId: json['ownerId'] as String,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-    );
+  id: json['id'] as String,
+  fileName: json['fileName'] as String,
+  mimeType: json['mimeType'] as String,
+  size: (json['size'] as num).toInt(),
+  ownerId: json['ownerId'] as String?,
+  labId: json['labId'] as String?,
+  sessionId: json['sessionId'] as String?,
+  storageKey: json['storageKey'] as String,
+  version: (json['version'] as num?)?.toInt(),
+  description: json['description'] as String?,
+  createdAt: json['createdAt'] == null
+      ? null
+      : DateTime.parse(json['createdAt'] as String),
+  updatedAt: json['updatedAt'] == null
+      ? null
+      : DateTime.parse(json['updatedAt'] as String),
+);
 
 Map<String, dynamic> _$FileModelToJson(FileModel instance) => <String, dynamic>{
-      'id': instance.id,
-      'fileName': instance.fileName,
-      'size': instance.size,
-      'labId': instance.labId,
-      'sessionId': instance.sessionId,
-      'ownerId': instance.ownerId,
-      'createdAt': instance.createdAt.toIso8601String(),
-    };
+  'id': instance.id,
+  'fileName': instance.fileName,
+  'mimeType': instance.mimeType,
+  'size': instance.size,
+  'ownerId': ?instance.ownerId,
+  'labId': ?instance.labId,
+  'sessionId': ?instance.sessionId,
+  'storageKey': instance.storageKey,
+  'version': ?instance.version,
+  'description': ?instance.description,
+  'createdAt': ?instance.createdAt?.toIso8601String(),
+  'updatedAt': ?instance.updatedAt?.toIso8601String(),
+};

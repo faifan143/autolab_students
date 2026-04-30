@@ -7,15 +7,17 @@ part of 'lab_model.dart';
 // **************************************************************************
 
 LabModel _$LabModelFromJson(Map<String, dynamic> json) => LabModel(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      teacherName: json['teacherName'] as String,
-      description: json['description'] as String?,
-    );
+  id: json['id'] as String,
+  name: json['name'] as String,
+  teacherName: json['teacherName'] as String,
+  description: json['description'] as String?,
+  teacherId: json['teacherId'] as String?,
+);
 
 Map<String, dynamic> _$LabModelToJson(LabModel instance) => <String, dynamic>{
-      'id': instance.id,
-      'name': instance.name,
-      'teacherName': instance.teacherName,
-      'description': instance.description,
-    };
+  'id': instance.id,
+  'name': instance.name,
+  'teacherName': instance.teacherName,
+  'description': instance.description,
+  'teacherId': instance.teacherId,
+};

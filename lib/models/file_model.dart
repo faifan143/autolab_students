@@ -4,22 +4,55 @@ part 'file_model.g.dart';
 
 @JsonSerializable()
 class FileModel {
+  @JsonKey(name: 'id')
   final String id;
+
+  @JsonKey(name: 'fileName')
   final String fileName;
+
+  @JsonKey(name: 'mimeType')
+  final String mimeType;
+
+  @JsonKey(name: 'size')
   final int size;
-  final String labId;
+
+  @JsonKey(name: 'ownerId', includeIfNull: false)
+  final String? ownerId;
+
+  @JsonKey(name: 'labId', includeIfNull: false)
+  final String? labId;
+
+  @JsonKey(name: 'sessionId', includeIfNull: false)
   final String? sessionId;
-  final String ownerId;
-  final DateTime createdAt;
+
+  @JsonKey(name: 'storageKey')
+  final String storageKey;
+
+  @JsonKey(name: 'version', includeIfNull: false)
+  final int? version;
+
+  @JsonKey(name: 'description', includeIfNull: false)
+  final String? description;
+
+  @JsonKey(name: 'createdAt', includeIfNull: false)
+  final DateTime? createdAt;
+
+  @JsonKey(name: 'updatedAt', includeIfNull: false)
+  final DateTime? updatedAt;
 
   FileModel({
     required this.id,
     required this.fileName,
+    required this.mimeType,
     required this.size,
-    required this.labId,
+    this.ownerId,
+    this.labId,
     this.sessionId,
-    required this.ownerId,
-    required this.createdAt,
+    required this.storageKey,
+    this.version,
+    this.description,
+    this.createdAt,
+    this.updatedAt,
   });
 
   factory FileModel.fromJson(Map<String, dynamic> json) =>
@@ -27,4 +60,3 @@ class FileModel {
 
   Map<String, dynamic> toJson() => _$FileModelToJson(this);
 }
-

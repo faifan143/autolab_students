@@ -28,13 +28,12 @@ void main() async {
     await FirebaseNotificationsService.initialize();
   } catch (e) {
     // Firebase initialization failed (e.g., missing google-services.json)
-    // App can still run without notifications
-    print('Firebase initialization failed: $e');
+    debugPrint('Firebase initialization error: $e');
   }
 
   // Initialize GetX controllers
-  Get.put(ThemeController());
   Get.put(LocaleController());
+  Get.put(ThemeController());
 
   runApp(const AutoLabStudentsApp());
 }
@@ -44,8 +43,8 @@ class AutoLabStudentsApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeController = Get.find<ThemeController>();
     final localeController = Get.find<LocaleController>();
+    final themeController = Get.find<ThemeController>();
 
     return MultiProvider(
       providers: [
@@ -58,20 +57,18 @@ class AutoLabStudentsApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ChatProvider()),
         ChangeNotifierProvider(create: (_) => StreamingProvider()),
       ],
-      child: Obx(
-        () => GetMaterialApp(
-          title: 'AutoLab Students',
-          debugShowCheckedModeBanner: false,
-          navigatorKey: AppRoutes.navigatorKey,
-          theme: AppTheme.lightTheme,
-          darkTheme: AppTheme.darkTheme,
-          themeMode: themeController.themeMode.value,
-          locale: localeController.locale.value,
-          translations: AppTranslations(),
-          fallbackLocale: const Locale('en'),
-          initialRoute: AppRoutes.splash,
-          getPages: AppRoutes.getPages,
-        ),
+      child: GetMaterialApp(
+        navigatorKey: AppRoutes.navigatorKey,
+        title: 'app_title'.tr,
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        themeMode: themeController.themeMode.value,
+        locale: localeController.locale.value,
+        fallbackLocale: const Locale('en'),
+        translations: AppTranslations(),
+        getPages: AppRoutes.getPages,
+        initialRoute: AppRoutes.splash,
       ),
     );
   }

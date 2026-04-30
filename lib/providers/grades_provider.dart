@@ -7,18 +7,17 @@ class GradesProvider extends ChangeNotifier {
   String? error;
   List<GradeModel> grades = [];
 
+  /// Load grades for the authenticated user
+  /// Optionally filter by labId
   Future<void> loadGrades({String? labId}) async {
     isLoading = true;
     error = null;
     notifyListeners();
 
     try {
-      if (labId != null) {
-        grades = await GradesService.getLabGrades(labId);
-      } else {
-        grades = await GradesService.getStudentGrades();
-      }
+      grades = await GradesService.getMyGrades(labId: labId);
       isLoading = false;
+      error = null;
       notifyListeners();
     } catch (e) {
       error = e.toString();
@@ -27,5 +26,3 @@ class GradesProvider extends ChangeNotifier {
     }
   }
 }
-
-

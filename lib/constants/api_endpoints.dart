@@ -9,8 +9,11 @@ class ApiEndpoints {
   static const String refresh = '/auth/refresh';
 
   // Student labs
-  static const String studentLabs = '/students/labs';
+  static const String enrolledLabs = '/labs'; // Get enrolled labs
+  static const String studentLabs =
+      '/students/labs'; // Get available labs (not enrolled)
   static String enrollInLab(String labId) => '/students/labs/$labId/enroll';
+  static String leaveLab(String labId) => '/students/labs/$labId/leave';
 
   // Sessions
   static String labSessions(String labId) => '/labs/$labId/sessions';
@@ -21,13 +24,17 @@ class ApiEndpoints {
   static const String submitAttendance = '/attendance/submit';
 
   // Grades
-  static const String studentGrades = '/students/grades';
-  static String labGrades(String labId) => '/students/grades/$labId';
+  static const String myGrades =
+      '/grades/me'; // Get authenticated user's grades
+  static const String studentGrades = '/students/grades'; // Legacy endpoint
+  static String labGrades(String labId) =>
+      '/students/grades/$labId'; // Legacy endpoint
 
   // Files
   static const String files = '/files';
   static String file(String id) => '/files/$id';
-  static String fileDownloadUrl(String id) => '/files/$id/download-url';
+  static String fileDownloadUrl(String id) =>
+      '/files/$id/url'; // Presigned download URL
 
   // Chat
   static const String chatMessages = '/chat/messages';
@@ -40,4 +47,7 @@ class ApiEndpoints {
 
   // FCM Token
   static const String fcmToken = '/students/fcm-token';
+
+  // Users
+  static String user(String userId) => '/users/$userId';
 }

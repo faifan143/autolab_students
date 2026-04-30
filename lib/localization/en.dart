@@ -64,7 +64,8 @@ const Map<String, String> enTranslations = {
   'about_section': 'About',
   'profile_details': 'Profile details',
   'about_app': 'About this app',
-  'about_app_description': 'AutoLab Students helps you track labs, sessions and grades.',
+  'about_app_description':
+      'AutoLab Students helps you track labs, sessions and grades.',
   'privacy_policy': 'Privacy policy',
   'logout_title': 'Log out?',
   'logout_message': 'You will be signed out from this device.',
@@ -93,8 +94,25 @@ const Map<String, String> enTranslations = {
   // Files
   'open_file': 'Open file',
   'file_details': 'File details',
+  'download_and_open': 'Download & Open',
+  'downloading': 'Downloading...',
+  'view_image': 'View Image',
+  'storage_permission_required':
+      'Storage permission is required to download files',
+  'download_failed': 'Failed to download file',
+  'no_app_to_open_file': 'No app available to open this file',
+  'warning': 'Warning',
+  'lab_not_found': 'Lab information not found',
 
   // Chat
+  'chat.title': 'Chat',
+  'chat.subtitle.lobby': 'Teachers community chat',
+  'chat.empty': 'No messages yet',
+  'chat.empty.subtitle': 'Start the conversation by sending a message',
+  'chat.error': 'Failed to load messages',
+  'chat.input.hint': 'Type a message...',
+  'chat.send': 'Send',
+  'chat.attach.file': 'Attach file',
   'type_message': 'Type a message',
   'send': 'Send',
 
@@ -110,7 +128,7 @@ const Map<String, String> enTranslations = {
   'ip_segment_4': 'IP segment 4',
   'port': 'Port',
   'save': 'Save',
-  
+
   // Labs
   'lab_details': 'Lab Details',
   'view_sessions': 'View Sessions',
@@ -120,7 +138,9 @@ const Map<String, String> enTranslations = {
   'enrolling': 'Enrolling...',
   'enrollment_success': 'Successfully enrolled in lab',
   'enrollment_error': 'Failed to enroll in lab',
-  
+  'enrolled_labs': 'Enrolled Labs',
+  'available_labs': 'Available Labs',
+
   // Sessions
   'session_details': 'Session Details',
   'start_time': 'Start Time',
@@ -129,48 +149,54 @@ const Map<String, String> enTranslations = {
   'not_streaming': 'Not Streaming',
   'recorded_video': 'Recorded Video',
   'no_recorded_video': 'No recorded video available',
-  
+
   // Attendance
   'present': 'Present',
   'late': 'Late',
   'absent': 'Absent',
   'attendance_submitted': 'Attendance submitted successfully',
   'attendance_submit_error': 'Failed to submit attendance',
-  
+
   // Grades
   'score': 'Score',
   'max_score': 'Max Score',
   'percentage': 'Percentage',
   'comment': 'Comment',
-  
+
   // Files
   'file_name': 'File Name',
   'file_size': 'File Size',
   'created_at': 'Created At',
   'no_files': 'No files available',
-  
+
   // Chat
   'no_messages': 'No messages yet',
   'chat_history': 'Chat History',
   'chat_no_lab_selected': 'Please select a lab to view chat',
   'go_back': 'Go Back',
-  
+
   // General / auth status
   'checking_authentication': 'Checking authentication...',
-  
+
   // Token expiration
   'token_expired': 'Session expired',
   'token_refresh_failed': 'Failed to refresh session. Please login again.',
   'session_expired_message': 'Your session has expired. Please login again.',
   'refreshing_token': 'Refreshing session...',
-  
+
   // Notification messages
-  'lab_enrollment_notification': 'You have been successfully enrolled in the lab',
+  'enrollment_confirmed': 'Enrollment Confirmed',
+  'enrollment_confirmed_message': 'You have successfully enrolled in the lab.',
+  'unenrollment_confirmed': 'Unenrollment Confirmed',
+  'unenrollment_confirmed_message': 'You have left the lab.',
+  'session_created': 'New Session Created',
+  'session_created_message': 'A new session has been scheduled.',
   'session_started': 'Session Started',
-  'session_started_notification': 'A lab session has started',
+  'session_started_message': 'The session has started.',
+  'session_updated': 'Session Updated',
+  'session_updated_message': 'The session details have been updated.',
   'session_ended': 'Session Ended',
-  'session_ended_notification': 'A lab session has ended',
+  'session_ended_message': 'The session has ended.',
   'new_message': 'New Message',
+  'new_chat_message': 'New chat message.',
 };
-
-

@@ -7,20 +7,19 @@ class AppTheme {
     final base = ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: AppColors.primary,
-        brightness: Brightness.light,
-      ).copyWith(
-        primary: AppColors.primary,
-        primaryContainer: AppColors.primarySoft,
-        secondary: AppColors.success,
-        background: AppColors.lightBackgroundPrimary,
-        surface: AppColors.lightBackgroundSurface,
-        error: AppColors.error,
-        onPrimary: Colors.white,
-        onBackground: AppColors.lightTextPrimary,
-        onSurface: AppColors.lightTextPrimary,
-      ),
+      colorScheme:
+          ColorScheme.fromSeed(
+            seedColor: AppColors.primary,
+            brightness: Brightness.light,
+          ).copyWith(
+            primary: AppColors.primary,
+            primaryContainer: AppColors.primarySoft,
+            secondary: AppColors.success,
+            surface: AppColors.lightBackgroundSurface,
+            error: AppColors.error,
+            onPrimary: Colors.white,
+            onSurface: AppColors.lightTextPrimary,
+          ),
       scaffoldBackgroundColor: AppColors.lightBackgroundPrimary,
     );
 
@@ -53,10 +52,7 @@ class AppTheme {
           backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
           shape: const StadiumBorder(), // Pill-shaped buttons
-          textStyle: const TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 16,
-          ),
+          textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
           disabledBackgroundColor: AppColors.lightDisabled,
           disabledForegroundColor: AppColors.lightTextMuted,
         ),
@@ -67,25 +63,22 @@ class AppTheme {
           foregroundColor: AppColors.primary,
           side: const BorderSide(color: AppColors.primary, width: 1.5),
           shape: const StadiumBorder(),
-          textStyle: const TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 14,
-          ),
+          textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: AppColors.primary,
-          textStyle: const TextStyle(
-            fontWeight: FontWeight.w500,
-            fontSize: 14,
-          ),
+          textStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.lightBackgroundSurface,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: AppColors.lightBorder, width: 1),
@@ -137,20 +130,19 @@ class AppTheme {
     final base = ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: AppColors.primary,
-        brightness: Brightness.dark,
-      ).copyWith(
-        primary: AppColors.primary,
-        primaryContainer: AppColors.primaryDark,
-        secondary: AppColors.success,
-        background: AppColors.darkBackgroundPrimary,
-        surface: AppColors.darkBackgroundSurface,
-        error: AppColors.error,
-        onPrimary: Colors.white,
-        onBackground: AppColors.darkTextPrimary,
-        onSurface: AppColors.darkTextPrimary,
-      ),
+      colorScheme:
+          ColorScheme.fromSeed(
+            seedColor: AppColors.primary,
+            brightness: Brightness.dark,
+          ).copyWith(
+            primary: AppColors.primary,
+            primaryContainer: AppColors.primaryDark,
+            secondary: AppColors.success,
+            surface: AppColors.darkBackgroundSurface,
+            error: AppColors.error,
+            onPrimary: Colors.white,
+            onSurface: AppColors.darkTextPrimary,
+          ),
       scaffoldBackgroundColor: AppColors.darkBackgroundPrimary,
     );
 
@@ -183,10 +175,7 @@ class AppTheme {
           backgroundColor: AppColors.primaryDark,
           foregroundColor: Colors.white,
           shape: const StadiumBorder(),
-          textStyle: const TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 16,
-          ),
+          textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
           disabledBackgroundColor: AppColors.darkDisabled,
           disabledForegroundColor: AppColors.darkTextMuted,
         ),
@@ -197,25 +186,22 @@ class AppTheme {
           foregroundColor: AppColors.primary,
           side: const BorderSide(color: AppColors.primary, width: 1.5),
           shape: const StadiumBorder(),
-          textStyle: const TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 14,
-          ),
+          textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: AppColors.primarySoft,
-          textStyle: const TextStyle(
-            fontWeight: FontWeight.w500,
-            fontSize: 14,
-          ),
+          textStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.darkBackgroundSurface,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: AppColors.darkBorder, width: 1),
