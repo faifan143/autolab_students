@@ -3,8 +3,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import '../routes/app_routes.dart';
-import '../constants/api_endpoints.dart';
-import 'api_service.dart';
 
 /// Firebase Cloud Messaging service for handling push notifications
 class FirebaseNotificationsService {
@@ -302,19 +300,11 @@ class FirebaseNotificationsService {
     }
   }
 
-  /// Register FCM token with backend
+  /// Register FCM token with backend.
+  /// Backend currently has no student FCM route (`/students/fcm-token` 404).
   static Future<void> registerFCMToken(String token) async {
-    try {
-      final dio = await ApiService.dio;
-      await dio.post(
-        ApiEndpoints.fcmToken,
-        data: {'fcmToken': token},
-      );
-      print('FCM token registered successfully: $token');
-    } catch (e) {
-      print('Failed to register FCM token: $e');
-      // Don't throw - allow app to continue even if token registration fails
-    }
+    // Skip until backend exposes a student FCM registration endpoint.
+    print('Skipping FCM token registration (no backend endpoint): $token');
   }
 
   /// Get FCM token for backend registration

@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import '../../models/lab_model.dart';
-import '../../models/user_model.dart';
 import '../../routes/app_routes.dart';
 import '../../providers/labs_provider.dart';
-import '../../services/user_service.dart';
 
 class LabDetailScreen extends StatefulWidget {
   const LabDetailScreen({super.key});
@@ -14,152 +12,24 @@ class LabDetailScreen extends StatefulWidget {
   State<LabDetailScreen> createState() => _LabDetailScreenState();
 }
 
-class _LabDetailScreenState extends State<LabDetailScreen>
-    with TickerProviderStateMixin {
-  UserModel? _teacher;
-  bool _isLoadingTeacher = false;
-  String? _teacherError;
-  late AnimationController _fadeController;
-
-  @override
-  void initState() {
-    super.initState();
-    _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 400),
-      vsync: this,
-    );
-    _loadTeacherInfo();
-  }
-
-  Future<void> _loadTeacherInfo() async {
+class _LabDetailScreenState extends State<LabDetailScreen> {
+  LabModel? _resolveLab(LabsProvider labsProvider) {
     final args = Get.arguments;
-    LabModel? lab;
-
-    if (args is LabModel) {
-      lab = args;
-    } else if (args is String) {
+    if (args is LabModel) return args;
+    if (args is String) {
       try {
-        final labsProvider = context.read<LabsProvider>();
-        lab = labsProvider.enrolledLabs.firstWhere(
-          (l) => l.id == args,
-          orElse: () => labsProvider.availableLabs.firstWhere(
-            (l) => l.id == args,
-            orElse: () => throw Exception('Lab not found'),
-          ),
-        );
-      } catch (e) {
-        return;
+        return labsProvider.enrolledLabs.firstWhere((l) => l.id == args);
+      } catch (_) {
+        return null;
       }
     }
-
-    if (lab == null || lab.teacherId == null) return;
-
-    setState(() {
-      _isLoadingTeacher = true;
-      _teacherError = null;
-    });
-
-    try {
-      final teacher = await UserService.getUserById(lab.teacherId!);
-      if (mounted) {
-        setState(() {
-          _teacher = teacher;
-          _isLoadingTeacher = false;
-        });
-        _fadeController.forward();
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _teacherError = e.toString();
-          _isLoadingTeacher = false;
-        });
-      }
-    }
-  }
-
-  Future<void> _handleEnroll(BuildContext context, String labId) async {
-    final labsProvider = context.read<LabsProvider>();
-    final success = await labsProvider.enrollInLab(labId);
-
-    if (context.mounted) {
-      if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          _buildSnackBar(context, 'Enrolled! 🎉', isSuccess: true),
-        );
-        Future.delayed(const Duration(milliseconds: 500), () {
-          Get.back();
-        });
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          _buildSnackBar(
-            context,
-            labsProvider.error ?? 'Failed to enroll',
-            isSuccess: false,
-          ),
-        );
-      }
-    }
-  }
-
-  SnackBar _buildSnackBar(
-    BuildContext context,
-    String message, {
-    required bool isSuccess,
-  }) {
-    return SnackBar(
-      content: Row(
-        children: [
-          Icon(
-            isSuccess ? Icons.check_circle : Icons.error,
-            color: Colors.white,
-            size: 16,
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              message,
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
-            ),
-          ),
-        ],
-      ),
-      backgroundColor: isSuccess ? Colors.green[600] : Colors.red[600],
-      duration: const Duration(milliseconds: 1800),
-      behavior: SnackBarBehavior.floating,
-      margin: const EdgeInsets.all(12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-    );
-  }
-
-  @override
-  void dispose() {
-    _fadeController.dispose();
-    super.dispose();
+    return null;
   }
 
   @override
   Widget build(BuildContext context) {
-    final args = Get.arguments;
-    LabModel? lab;
-
-    if (args is LabModel) {
-      lab = args;
-    } else if (args is String) {
-      final labsProvider = context.watch<LabsProvider>();
-      try {
-        lab = labsProvider.enrolledLabs.firstWhere(
-          (l) => l.id == args,
-          orElse: () => labsProvider.availableLabs.firstWhere(
-            (l) => l.id == args,
-            orElse: () => throw Exception('Lab not found'),
-          ),
-        );
-      } catch (e) {
-        lab = null;
-      }
-    }
+    final labsProvider = context.watch<LabsProvider>();
+    final lab = _resolveLab(labsProvider);
 
     if (lab == null) {
       return Scaffold(
@@ -186,15 +56,15 @@ class _LabDetailScreenState extends State<LabDetailScreen>
       );
     }
 
-    final labModel = lab;
-    final labsProvider = context.watch<LabsProvider>();
-    final isEnrolled = labsProvider.labs.any((l) => l.id == labModel.id);
+    final instructorName = labsProvider.getTeacherName(
+      lab.teacherId,
+      fallback: lab.teacherName,
+    );
 
     return Scaffold(
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
-            // Header
             SliverAppBar(
               pinned: true,
               elevation: 0,
@@ -203,7 +73,6 @@ class _LabDetailScreenState extends State<LabDetailScreen>
               leading: _buildBackButton(context),
               title: const SizedBox.shrink(),
             ),
-            // Content
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -211,38 +80,28 @@ class _LabDetailScreenState extends State<LabDetailScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 8),
-                    // Title
                     Text(
-                      labModel.name,
+                      lab.name,
                       style: Theme.of(context).textTheme.headlineSmall
                           ?.copyWith(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 20),
-
-                    // Teacher
-                    _buildTeacherSection(context),
+                    _buildTeacherSection(context, instructorName),
                     const SizedBox(height: 20),
-
-                    // Description
-                    if (labModel.description != null &&
-                        labModel.description!.isNotEmpty)
-                      _buildDescription(context, labModel.description!),
-
+                    if (lab.description != null && lab.description!.isNotEmpty)
+                      _buildDescription(context, lab.description!),
                     const SizedBox(height: 32),
                   ],
                 ),
               ),
             ),
-            // Actions
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: !isEnrolled
-                    ? _buildEnrollButton(context, labModel, labsProvider)
-                    : _buildActionGrid(context, labModel),
+                child: _buildActionGrid(context, lab),
               ),
             ),
-            SliverToBoxAdapter(child: SizedBox(height: 24)),
+            const SliverToBoxAdapter(child: SizedBox(height: 24)),
           ],
         ),
       ),
@@ -270,7 +129,7 @@ class _LabDetailScreenState extends State<LabDetailScreen>
     );
   }
 
-  Widget _buildTeacherSection(BuildContext context) {
+  Widget _buildTeacherSection(BuildContext context, String instructorName) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -291,132 +150,48 @@ class _LabDetailScreenState extends State<LabDetailScreen>
             ),
           ),
           const SizedBox(height: 10),
-          if (_isLoadingTeacher)
-            _buildLoadingState(context)
-          else if (_teacherError != null)
-            _buildErrorState(context)
-          else if (_teacher != null)
-            _buildTeacherInfo(context)
-          else
-            _buildFallbackTeacher(context),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLoadingState(BuildContext context) {
-    return Row(
-      children: [
-        SizedBox(
-          width: 14,
-          height: 14,
-          child: CircularProgressIndicator(
-            strokeWidth: 1.5,
-            valueColor: AlwaysStoppedAnimation(Theme.of(context).primaryColor),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Text(
-          'Loading...',
-          style: Theme.of(
-            context,
-          ).textTheme.labelSmall?.copyWith(color: Colors.grey[500]),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildErrorState(BuildContext context) {
-    return Row(
-      children: [
-        Icon(Icons.error_outline, size: 14, color: Colors.red[600]),
-        const SizedBox(width: 8),
-        Text(
-          'Failed to load',
-          style: Theme.of(
-            context,
-          ).textTheme.labelSmall?.copyWith(color: Colors.red[600]),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTeacherInfo(BuildContext context) {
-    return FadeTransition(
-      opacity: Tween<double>(begin: 0, end: 1).animate(_fadeController),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: LinearGradient(
-                colors: [
-                  Theme.of(context).primaryColor.withOpacity(0.25),
-                  Theme.of(context).primaryColor.withOpacity(0.1),
-                ],
-              ),
-            ),
-            child: Center(
-              child: Text(
-                _teacher!.name.isNotEmpty
-                    ? _teacher!.name[0].toUpperCase()
-                    : '?',
-                style: TextStyle(
-                  color: Theme.of(context).primaryColor,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
+          Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    colors: [
+                      Theme.of(context).primaryColor.withOpacity(0.25),
+                      Theme.of(context).primaryColor.withOpacity(0.1),
+                    ],
+                  ),
+                ),
+                child: Center(
+                  child: Text(
+                    instructorName.isNotEmpty
+                        ? instructorName[0].toUpperCase()
+                        : '?',
+                    style: TextStyle(
+                      color: Theme.of(context).primaryColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _teacher!.name,
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  instructorName,
                   style: Theme.of(context).textTheme.labelMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 2),
-                Row(
-                  children: [
-                    Icon(Icons.mail_outline, size: 11, color: Colors.grey[400]),
-                    const SizedBox(width: 3),
-                    Expanded(
-                      child: Text(
-                        _teacher!.email,
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: Colors.grey[500],
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildFallbackTeacher(BuildContext context) {
-    return Text(
-      Get.arguments is LabModel
-          ? (Get.arguments as LabModel).teacherName
-          : 'Unknown',
-      style: Theme.of(
-        context,
-      ).textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w600),
     );
   }
 
@@ -450,46 +225,6 @@ class _LabDetailScreenState extends State<LabDetailScreen>
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildEnrollButton(
-    BuildContext context,
-    LabModel lab,
-    LabsProvider labsProvider,
-  ) {
-    return SizedBox(
-      width: double.infinity,
-      height: 48,
-      child: ElevatedButton.icon(
-        onPressed: labsProvider.isEnrolling
-            ? null
-            : () => _handleEnroll(context, lab.id),
-        icon: labsProvider.isEnrolling
-            ? SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(
-                  strokeWidth: 1.5,
-                  valueColor: AlwaysStoppedAnimation(
-                    Theme.of(context).primaryColor,
-                  ),
-                ),
-              )
-            : const Icon(Icons.check_circle_outline, size: 18),
-        label: Text(
-          labsProvider.isEnrolling ? 'Enrolling...' : 'Enroll Now',
-          style: const TextStyle(
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.2,
-          ),
-        ),
-        style: ElevatedButton.styleFrom(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-      ),
     );
   }
 

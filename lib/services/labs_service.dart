@@ -3,7 +3,8 @@ import '../constants/api_endpoints.dart';
 import 'api_service.dart';
 
 class LabsService {
-  /// Get all labs for the current student (enrolled labs)
+  /// Enrolled labs for the current student (`GET /labs`).
+  /// Backend filters to labs where the student is in `students`.
   static Future<List<LabModel>> getStudentLabs() async {
     final dio = await ApiService.dio;
     final response = await dio.get(ApiEndpoints.enrolledLabs);
@@ -12,18 +13,10 @@ class LabsService {
     return data.map((json) => LabModel.fromJson(json)).toList();
   }
 
-  /// Get available labs (not enrolled)
-  static Future<List<LabModel>> getAvailableLabs() async {
+  /// Single lab (`GET /labs/:id`) — student must be enrolled.
+  static Future<LabModel> getLab(String labId) async {
     final dio = await ApiService.dio;
-    final response = await dio.get(ApiEndpoints.studentLabs);
-    
-    final List<dynamic> data = response.data;
-    return data.map((json) => LabModel.fromJson(json)).toList();
-  }
-
-  /// Enroll student in a lab
-  static Future<void> enrollInLab(String labId) async {
-    final dio = await ApiService.dio;
-    await dio.post(ApiEndpoints.enrollInLab(labId));
+    final response = await dio.get(ApiEndpoints.lab(labId));
+    return LabModel.fromJson(response.data);
   }
 }
