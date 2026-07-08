@@ -20,8 +20,9 @@ class ApiEndpoints {
   static String session(String sessionId) => '/sessions/$sessionId';
 
   // Attendance
-  static const String studentAttendance = '/students/attendance';
-  static const String submitAttendance = '/attendance/submit';
+  static const String studentAttendance = '/attendance/me';
+  static String myCheckInQr(String sessionId) =>
+      '/attendance/sessions/$sessionId/my-qr';
 
   // Grades
   static const String myGrades =

@@ -1,7 +1,41 @@
 allprojects {
     repositories {
+        maven(url = "https://maven.aliyun.com/repository/google")
+        maven(url = "https://maven.aliyun.com/repository/public")
         google()
         mavenCentral()
+    }
+}
+
+subprojects {
+    // flutter_local_notifications requests AGP 8.6.0 in its buildscript.
+    // Some environments fail to resolve that exact artifact, while the app already
+    // uses AGP 8.9.1. Align plugin classpath/transitives to the project's AGP.
+    buildscript {
+        repositories {
+            maven(url = "https://maven.aliyun.com/repository/google")
+            maven(url = "https://maven.aliyun.com/repository/public")
+            google()
+            mavenCentral()
+        }
+        configurations.matching { it.name == "classpath" }.all {
+            resolutionStrategy.eachDependency {
+                if (requested.group == "com.android.tools.build" &&
+                    requested.name == "gradle" &&
+                    requested.version == "8.6.0"
+                ) {
+                    useVersion("8.9.1")
+                    because("Align plugin AGP with root project")
+                }
+                if (requested.group == "com.android.tools.build" &&
+                    requested.name == "builder" &&
+                    requested.version == "8.6.0"
+                ) {
+                    useVersion("8.9.1")
+                    because("Avoid missing builder-8.6.0 artifact")
+                }
+            }
+        }
     }
 }
 

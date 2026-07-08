@@ -14,6 +14,8 @@ SessionModel _$SessionModelFromJson(Map<String, dynamic> json) => SessionModel(
       ? null
       : DateTime.parse(json['endTime'] as String),
   isStreaming: json['isStreaming'] as bool,
+  streamUrl: json['streamUrl'] as String?,
+  streamKey: json['streamKey'] as String?,
   recordedVideoUrl: json['recordedVideoUrl'] as String?,
 );
 
@@ -24,5 +26,7 @@ Map<String, dynamic> _$SessionModelToJson(SessionModel instance) =>
       'startTime': instance.startTime.toIso8601String(),
       'endTime': instance.endTime?.toIso8601String(),
       'isStreaming': instance.isStreaming,
+      'streamUrl': instance.streamUrl,
+      'streamKey': instance.streamKey,
       'recordedVideoUrl': instance.recordedVideoUrl,
     };

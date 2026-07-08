@@ -168,6 +168,35 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
                         ),
                         const SizedBox(height: 20),
                       ],
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 48,
+                        child: ElevatedButton.icon(
+                          onPressed: _sessionId != null
+                              ? () {
+                                  Get.toNamed(
+                                    AppRoutes.studentQr,
+                                    arguments: _sessionId,
+                                  );
+                                }
+                              : null,
+                          icon: const Icon(Icons.qr_code_2, size: 18),
+                          label: Text(
+                            'show_attendance_qr'.tr,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.2,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
                       // Live Stream Button
                       if (sessionsProvider.currentSession!.isStreaming) ...[
                         Text(

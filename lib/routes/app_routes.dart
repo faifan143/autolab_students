@@ -11,7 +11,7 @@ import '../screens/sessions/sessions_list_screen.dart';
 import '../screens/sessions/session_detail_screen.dart';
 import '../screens/sessions/session_streaming_screen.dart';
 import '../screens/attendance/attendance_screen.dart';
-import '../screens/attendance/qr_scanner_screen.dart';
+import '../screens/attendance/student_qr_screen.dart';
 import '../screens/grades/grades_list_screen.dart';
 import '../screens/files/files_list_screen.dart';
 import '../screens/chat/chat_screen.dart';
@@ -32,7 +32,7 @@ class AppRoutes {
   static const String sessionDetail = '/sessions/detail';
   static const String sessionStreaming = '/sessions/streaming';
   static const String attendance = '/attendance';
-  static const String qrScanner = '/attendance/qr';
+  static const String studentQr = '/attendance/student-qr';
   static const String grades = '/grades';
   static const String files = '/files';
   static const String chat = '/chat';
@@ -51,7 +51,7 @@ class AppRoutes {
         name: sessionStreaming,
         page: () => const SessionStreamingScreen()),
     GetPage(name: attendance, page: () => const AttendanceScreen()),
-    GetPage(name: qrScanner, page: () => const QrScannerScreen()),
+    GetPage(name: studentQr, page: () => const StudentQrScreen()),
     GetPage(name: grades, page: () => const GradesListScreen()),
     GetPage(name: files, page: () => const FilesListScreen()),
     GetPage(name: chat, page: () => const ChatScreen()),

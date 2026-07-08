@@ -85,6 +85,14 @@ const Map<String, String> arTranslations = {
 
   // Attendance
   'scan_qr': 'مسح رمز QR',
+  'show_attendance_qr': 'عرض رمز الحضور',
+  'show_attendance_qr_hint':
+      'اعرض هذا الرمز لمعلمك عند تسجيل الحضور.',
+  'attendance_qr_hint':
+      'افتح جلسة واضغط "عرض رمز الحضور" أثناء المحاضرة.',
+  'attendance_qr_error': 'تعذر تحميل رمز الحضور',
+  'refresh_qr': 'تحديث الرمز',
+  'expires_at': 'ينتهي في',
   'attendance_history': 'سجل الحضور',
 
   // Grades

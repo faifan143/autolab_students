@@ -191,12 +191,6 @@ class _LabDetailScreenState extends State<LabDetailScreen>
     final isEnrolled = labsProvider.labs.any((l) => l.id == labModel.id);
 
     return Scaffold(
-      floatingActionButton: isEnrolled
-          ? FloatingActionButton(
-              onPressed: () => Get.toNamed(AppRoutes.qrScanner),
-              child: const Icon(Icons.qr_code_scanner),
-            )
-          : null,
       body: SafeArea(
         child: CustomScrollView(
           slivers: [

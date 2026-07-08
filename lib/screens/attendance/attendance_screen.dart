@@ -39,16 +39,9 @@ class AttendanceScreen extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () async {
-                    await Get.toNamed(AppRoutes.qrScanner);
-                    attendanceProvider.loadAttendance();
-                  },
-                  icon: const Icon(Icons.qr_code_scanner),
-                  label: Text('scan_qr'.tr),
-                ),
+              child: Text(
+                'attendance_qr_hint'.tr,
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
             ),
             const SizedBox(height: 8),

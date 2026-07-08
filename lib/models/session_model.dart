@@ -9,6 +9,8 @@ class SessionModel {
   final DateTime startTime;
   final DateTime? endTime;
   final bool isStreaming;
+  final String? streamUrl;
+  final String? streamKey;
   final String? recordedVideoUrl;
 
   SessionModel({
@@ -17,6 +19,8 @@ class SessionModel {
     required this.startTime,
     this.endTime,
     required this.isStreaming,
+    this.streamUrl,
+    this.streamKey,
     this.recordedVideoUrl,
   });
 

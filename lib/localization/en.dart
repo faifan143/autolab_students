@@ -85,6 +85,14 @@ const Map<String, String> enTranslations = {
 
   // Attendance
   'scan_qr': 'Scan QR',
+  'show_attendance_qr': 'Show Attendance QR',
+  'show_attendance_qr_hint':
+      'Show this QR code to your teacher when they scan attendance.',
+  'attendance_qr_hint':
+      'Open a session and tap "Show Attendance QR" during class.',
+  'attendance_qr_error': 'Could not load attendance QR',
+  'refresh_qr': 'Refresh QR',
+  'expires_at': 'Expires at',
   'attendance_history': 'Attendance History',
 
   // Grades

@@ -37,7 +37,7 @@ class FirebaseNotificationsService {
       );
 
       await _localNotifications.initialize(
-        settings: initSettings,
+        initSettings,
         onDidReceiveNotificationResponse: _onNotificationTapped,
       );
 
@@ -123,10 +123,10 @@ class FirebaseNotificationsService {
     );
 
     await _localNotifications.show(
-      id: DateTime.now().millisecondsSinceEpoch.remainder(100000),
-      title: title,
-      body: body,
-      notificationDetails: notificationDetails,
+      DateTime.now().millisecondsSinceEpoch.remainder(100000),
+      title,
+      body,
+      notificationDetails,
       payload: jsonEncode(data),
     );
   }
@@ -346,7 +346,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
       iOS: iosSettings,
     );
 
-    await localNotifications.initialize(settings: initSettings);
+    await localNotifications.initialize(initSettings);
 
     // Create notification channel for Android
     const androidChannel = AndroidNotificationChannel(
@@ -377,10 +377,10 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     );
 
     await localNotifications.show(
-      id: DateTime.now().millisecondsSinceEpoch.remainder(100000),
-      title: notification.title ?? 'AutoLab',
-      body: notification.body ?? '',
-      notificationDetails: notificationDetails,
+      DateTime.now().millisecondsSinceEpoch.remainder(100000),
+      notification.title ?? 'AutoLab',
+      notification.body ?? '',
+      notificationDetails,
       payload: jsonEncode(data),
     );
   }

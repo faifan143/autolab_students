@@ -6,6 +6,8 @@ class AttendanceProvider extends ChangeNotifier {
   bool isLoading = false;
   String? error;
   List<AttendanceModel> attendanceHistory = [];
+  String? checkInToken;
+  DateTime? checkInExpiresAt;
 
   Future<void> loadAttendance() async {
     isLoading = true;
@@ -23,24 +25,25 @@ class AttendanceProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> submitAttendance(String qrToken) async {
+  Future<bool> loadCheckInQr(String sessionId) async {
     isLoading = true;
     error = null;
     notifyListeners();
 
     try {
-      await AttendanceService.submitAttendance(qrToken);
+      final response = await AttendanceService.getMyCheckInQr(sessionId);
+      checkInToken = response.token;
+      checkInExpiresAt = DateTime.tryParse(response.expiresAt);
       isLoading = false;
       notifyListeners();
-      await loadAttendance(); // Refresh list
       return true;
     } catch (e) {
       error = e.toString();
+      checkInToken = null;
+      checkInExpiresAt = null;
       isLoading = false;
       notifyListeners();
       return false;
     }
   }
 }
-
-
