@@ -16,6 +16,7 @@ import '../screens/grades/grades_list_screen.dart';
 import '../screens/files/files_list_screen.dart';
 import '../screens/chat/chat_screen.dart';
 import '../screens/settings/settings_screen.dart';
+import '../screens/complaints/complaints_screen.dart';
 
 class AppRoutes {
   static final GlobalKey<NavigatorState> navigatorKey =
@@ -36,6 +37,7 @@ class AppRoutes {
   static const String grades = '/grades';
   static const String files = '/files';
   static const String chat = '/chat';
+  static const String complaints = '/complaints';
   static const String settings = '/settings';
 
   static final List<GetPage<dynamic>> getPages = [
@@ -55,6 +57,7 @@ class AppRoutes {
     GetPage(name: grades, page: () => const GradesListScreen()),
     GetPage(name: files, page: () => const FilesListScreen()),
     GetPage(name: chat, page: () => const ChatScreen()),
+    GetPage(name: complaints, page: () => const ComplaintsScreen()),
     GetPage(name: settings, page: () => const SettingsScreen()),
   ];
 }

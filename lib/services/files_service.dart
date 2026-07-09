@@ -84,8 +84,9 @@ class FilesService {
         await downloadDir.create(recursive: true);
       }
 
-      // Create file path
-      final filePath = '${downloadDir.path}/$fileName';
+      // Create a safe local filename so files always open reliably.
+      final safeName = _safeLocalFileName(fileId, fileName);
+      final filePath = '${downloadDir.path}/$safeName';
       final file = File(filePath);
 
       // Get presigned download URL from API
@@ -112,6 +113,12 @@ class FilesService {
     } catch (e) {
       throw Exception('Error downloading file: $e');
     }
+  }
+
+  static String _safeLocalFileName(String fileId, String fileName) {
+    final normalized = fileName.trim().isEmpty ? 'file' : fileName.trim();
+    final sanitized = normalized.replaceAll(RegExp(r'[\\/:*?"<>|]'), '_');
+    return '$fileId-$sanitized';
   }
 
   /// Upload a file

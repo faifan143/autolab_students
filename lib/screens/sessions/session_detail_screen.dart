@@ -47,8 +47,8 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
               pinned: true,
               elevation: 0,
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-              leading: _buildBackButton(context),
-              title: const SizedBox.shrink(),
+              automaticallyImplyLeading: true,
+              title: Text('session_details'.tr),
             ),
             // Content
             if (sessionsProvider.isLoading)
@@ -172,6 +172,46 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
                       SizedBox(
                         width: double.infinity,
                         height: 48,
+                        child: OutlinedButton.icon(
+                          onPressed: () {
+                            final session = sessionsProvider.currentSession!;
+                            Get.toNamed(
+                              AppRoutes.files,
+                              arguments: {
+                                'labId': session.labId,
+                                'sessionId': session.id,
+                              },
+                            );
+                          },
+                          icon: const Icon(Icons.folder_open_outlined, size: 18),
+                          label: Text('files'.tr),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 48,
+                        child: OutlinedButton.icon(
+                          onPressed: () {
+                            final session = sessionsProvider.currentSession!;
+                            Get.toNamed(
+                              AppRoutes.chat,
+                              arguments: {
+                                'channel': 'session:${session.id}',
+                                'labId': session.labId,
+                                'sessionId': session.id,
+                                'title': 'chat'.tr,
+                              },
+                            );
+                          },
+                          icon: const Icon(Icons.chat_bubble_outline, size: 18),
+                          label: Text('chat'.tr),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 48,
                         child: ElevatedButton.icon(
                           onPressed: _sessionId != null
                               ? () {
@@ -247,27 +287,6 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
     );
   }
 
-  Widget _buildBackButton(BuildContext context) {
-    return Center(
-      child: GestureDetector(
-        onTap: () => Get.back(),
-        child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 8),
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Theme.of(context).primaryColor.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(
-            Icons.arrow_back,
-            color: Theme.of(context).primaryColor,
-            size: 20,
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildInfoCard(
     BuildContext context, {
     required IconData icon,
@@ -280,7 +299,7 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
         borderRadius: BorderRadius.circular(12),
         color: Theme.of(context).cardColor,
         border: Border.all(
-          color: Theme.of(context).primaryColor.withOpacity(0.08),
+          color: Theme.of(context).primaryColor.withValues(alpha:0.08),
           width: 1,
         ),
       ),
@@ -290,7 +309,7 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Theme.of(context).primaryColor.withOpacity(0.1),
+              color: Theme.of(context).primaryColor.withValues(alpha:0.1),
             ),
             child: Icon(icon, color: Theme.of(context).primaryColor, size: 18),
           ),
@@ -331,11 +350,11 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
         borderRadius: BorderRadius.circular(12),
         color: isStreaming
             ? Colors.red[50]
-            : Theme.of(context).primaryColor.withOpacity(0.05),
+            : Theme.of(context).primaryColor.withValues(alpha:0.05),
         border: Border.all(
           color: isStreaming
               ? Colors.red[200]!
-              : Theme.of(context).primaryColor.withOpacity(0.1),
+              : Theme.of(context).primaryColor.withValues(alpha:0.1),
           width: 1,
         ),
       ),
@@ -362,7 +381,7 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Theme.of(context).primaryColor.withOpacity(0.1),
+                color: Theme.of(context).primaryColor.withValues(alpha:0.1),
               ),
               child: Icon(
                 Icons.videocam_outlined,
@@ -410,9 +429,9 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
-          color: Theme.of(context).primaryColor.withOpacity(0.08),
+          color: Theme.of(context).primaryColor.withValues(alpha:0.08),
           border: Border.all(
-            color: Theme.of(context).primaryColor.withOpacity(0.2),
+            color: Theme.of(context).primaryColor.withValues(alpha:0.2),
             width: 1,
           ),
         ),
@@ -422,7 +441,7 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Theme.of(context).primaryColor.withOpacity(0.15),
+                color: Theme.of(context).primaryColor.withValues(alpha:0.15),
               ),
               child: Icon(
                 Icons.play_circle_outlined,

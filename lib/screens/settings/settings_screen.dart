@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../controllers/locale_controller.dart';
 import '../../controllers/theme_controller.dart';
 import '../../providers/auth_provider.dart';
+import '../../routes/app_routes.dart';
 import '../../services/storage_service.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/ip_config_dialog.dart';
@@ -25,21 +26,23 @@ class SettingsScreen extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: true,
+        title: Text('settings'.tr),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (_) => const IpConfigDialog(),
+          );
+        },
+        child: const Icon(Icons.settings),
+      ),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: () => Get.back(),
-                ),
-                const SizedBox(width: 8),
-                Text('settings'.tr, style: theme.textTheme.titleMedium),
-              ],
-            ),
-            const SizedBox(height: 8),
             _ProfileHeader(theme: theme),
             const SizedBox(height: 16),
             Text('account_section'.tr, style: theme.textTheme.titleSmall),
@@ -50,7 +53,7 @@ class SettingsScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: theme.shadowColor.withOpacity(0.05),
+                    color: theme.shadowColor.withValues(alpha:0.05),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -100,7 +103,7 @@ class SettingsScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: theme.shadowColor.withOpacity(0.05),
+                    color: theme.shadowColor.withValues(alpha:0.05),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -146,36 +149,13 @@ class SettingsScreen extends StatelessWidget {
                       );
                     },
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text('about_section'.tr, style: theme.textTheme.titleSmall),
-            const SizedBox(height: 8),
-            Container(
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surface,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: theme.shadowColor.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Column(
-                children: [
-                  ListTile(
-                    leading: const Icon(Icons.info_outline),
-                    title: Text('about_app'.tr),
-                    subtitle: Text('about_app_description'.tr),
-                  ),
                   const Divider(height: 1),
                   ListTile(
-                    leading: const Icon(Icons.privacy_tip_outlined),
-                    title: Text('privacy_policy'.tr),
-                    onTap: () {},
+                    leading: const Icon(Icons.report_gmailerrorred_outlined),
+                    title: Text('complaints'.tr),
+                    subtitle: Text('submit_or_track_complaints'.tr),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => Get.toNamed(AppRoutes.complaints),
                   ),
                 ],
               ),
@@ -208,7 +188,7 @@ class _ProfileHeader extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: theme.shadowColor.withOpacity(0.05),
+            color: theme.shadowColor.withValues(alpha:0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -238,7 +218,7 @@ class _ProfileHeader extends StatelessWidget {
                 Text(
                   'role_student'.tr,
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.textTheme.bodySmall?.color?.withOpacity(0.8),
+                    color: theme.textTheme.bodySmall?.color?.withValues(alpha:0.8),
                   ),
                 ),
               ],
@@ -299,6 +279,7 @@ class _LogoutButton extends StatelessWidget {
         );
 
         if (confirmed == true) {
+          if (!context.mounted) return;
           final authProvider = context.read<AuthProvider>();
           await authProvider.logout();
         }

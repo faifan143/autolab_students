@@ -49,7 +49,15 @@ class ChatMessageModel {
   Map<String, dynamic> toJson() => _$ChatMessageModelToJson(this);
 
   // Helper getter for backward compatibility
-  String get senderName => sender?.name ?? 'Unknown';
+  String get senderName {
+    if (sender?.name != null && sender!.name.trim().isNotEmpty) {
+      return sender!.name.trim();
+    }
+    if (senderId.length >= 6) {
+      return 'User ${senderId.substring(senderId.length - 6)}';
+    }
+    return 'User';
+  }
   
   // Helper getter for backward compatibility
   DateTime get timestamp => createdAt;

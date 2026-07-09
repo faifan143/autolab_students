@@ -402,6 +402,11 @@ class _HomeTopBar extends StatelessWidget {
         ),
 
         IconButton(
+          onPressed: () => Get.toNamed(AppRoutes.complaints),
+          icon: const Icon(Icons.report_gmailerrorred_outlined),
+          tooltip: 'complaints'.tr,
+        ),
+        IconButton(
           onPressed: () => Get.toNamed(AppRoutes.settings),
           icon: const Icon(Icons.settings_outlined),
         ),

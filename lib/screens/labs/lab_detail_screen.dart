@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
-import '../../models/lab_model.dart';
-import '../../routes/app_routes.dart';
-import '../../providers/labs_provider.dart';
 
-class LabDetailScreen extends StatefulWidget {
+import '../../models/lab_model.dart';
+import '../../providers/labs_provider.dart';
+import '../../routes/app_routes.dart';
+import '../../widgets/app_cards.dart';
+
+class LabDetailScreen extends StatelessWidget {
   const LabDetailScreen({super.key});
 
-  @override
-  State<LabDetailScreen> createState() => _LabDetailScreenState();
-}
-
-class _LabDetailScreenState extends State<LabDetailScreen> {
   LabModel? _resolveLab(LabsProvider labsProvider) {
     final args = Get.arguments;
     if (args is LabModel) return args;
@@ -23,34 +20,41 @@ class _LabDetailScreenState extends State<LabDetailScreen> {
         return null;
       }
     }
+    if (args is Map<String, dynamic>) {
+      final labId = args['labId'] as String?;
+      if (labId == null) return null;
+      try {
+        return labsProvider.enrolledLabs.firstWhere((l) => l.id == labId);
+      } catch (_) {
+        return null;
+      }
+    }
     return null;
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = theme.colorScheme;
     final labsProvider = context.watch<LabsProvider>();
     final lab = _resolveLab(labsProvider);
 
     if (lab == null) {
       return Scaffold(
-        body: SafeArea(
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.error_outline, size: 48, color: Colors.red[600]),
-                const SizedBox(height: 12),
-                Text(
-                  'Lab Not Found',
-                  style: Theme.of(context).textTheme.titleSmall,
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => Get.back(),
-                  child: const Text('Go Back'),
-                ),
-              ],
-            ),
+        appBar: AppBar(title: Text('labs'.tr)),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.error_outline, size: 48, color: color.error),
+              const SizedBox(height: 12),
+              Text('lab_not_found'.tr, style: theme.textTheme.titleSmall),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => Get.back(),
+                child: Text('go_back'.tr),
+              ),
+            ],
           ),
         ),
       );
@@ -62,271 +66,112 @@ class _LabDetailScreenState extends State<LabDetailScreen> {
     );
 
     return Scaffold(
-      body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            SliverAppBar(
-              pinned: true,
-              elevation: 0,
-              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-              toolbarHeight: 56,
-              leading: _buildBackButton(context),
-              title: const SizedBox.shrink(),
-            ),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 8),
-                    Text(
-                      lab.name,
-                      style: Theme.of(context).textTheme.headlineSmall
-                          ?.copyWith(fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 20),
-                    _buildTeacherSection(context, instructorName),
-                    const SizedBox(height: 20),
-                    if (lab.description != null && lab.description!.isNotEmpty)
-                      _buildDescription(context, lab.description!),
-                    const SizedBox(height: 32),
-                  ],
-                ),
-              ),
-            ),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: _buildActionGrid(context, lab),
-              ),
-            ),
-            const SliverToBoxAdapter(child: SizedBox(height: 24)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBackButton(BuildContext context) {
-    return Center(
-      child: GestureDetector(
-        onTap: () => Get.back(),
-        child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 8),
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Theme.of(context).primaryColor.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(
-            Icons.arrow_back,
-            color: Theme.of(context).primaryColor,
-            size: 20,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTeacherSection(BuildContext context, String instructorName) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: Theme.of(context).cardColor,
-        border: Border.all(
-          color: Theme.of(context).primaryColor.withOpacity(0.08),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      appBar: AppBar(title: Text(lab.name)),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
         children: [
-          Text(
-            'Instructor',
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: Colors.grey[500],
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: LinearGradient(
-                    colors: [
-                      Theme.of(context).primaryColor.withOpacity(0.25),
-                      Theme.of(context).primaryColor.withOpacity(0.1),
+          AppSurfaceCard(
+            child: Row(
+              children: [
+                AppIconBadge(icon: Icons.science_outlined),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        lab.name,
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${'teacher'.tr}: $instructorName',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: color.onSurfaceVariant,
+                        ),
+                      ),
                     ],
                   ),
                 ),
-                child: Center(
-                  child: Text(
-                    instructorName.isNotEmpty
-                        ? instructorName[0].toUpperCase()
-                        : '?',
-                    style: TextStyle(
-                      color: Theme.of(context).primaryColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+              ],
+            ),
+          ),
+          if (lab.description != null && lab.description!.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            AppSurfaceCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'description'.tr,
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: color.onSurfaceVariant,
                     ),
                   ),
+                  const SizedBox(height: 8),
+                  Text(
+                    lab.description!,
+                    style: theme.textTheme.bodyMedium,
+                  ),
+                ],
+              ),
+            ),
+          ],
+          const SizedBox(height: 20),
+          GridView.count(
+            crossAxisCount: 2,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            childAspectRatio: 1.05,
+            children: [
+              AppActionCard(
+                icon: Icons.event_outlined,
+                title: 'sessions'.tr,
+                subtitle: 'labs_sessions_subtitle'.tr,
+                onTap: () => Get.toNamed(
+                  AppRoutes.sessions,
+                  arguments: {'labId': lab.id, 'labName': lab.name},
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  instructorName,
-                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+              AppActionCard(
+                icon: Icons.grade_outlined,
+                title: 'grades'.tr,
+                subtitle: 'labs_grades_subtitle'.tr,
+                onTap: () => Get.toNamed(
+                  AppRoutes.grades,
+                  arguments: {'labId': lab.id, 'labName': lab.name},
+                ),
+              ),
+              AppActionCard(
+                icon: Icons.folder_open_outlined,
+                title: 'files'.tr,
+                subtitle: 'labs_files_subtitle'.tr,
+                onTap: () => Get.toNamed(
+                  AppRoutes.files,
+                  arguments: {'labId': lab.id, 'labName': lab.name},
+                ),
+              ),
+              AppActionCard(
+                icon: Icons.chat_bubble_outline,
+                title: 'chat'.tr,
+                subtitle: 'labs_chat_subtitle'.tr,
+                onTap: () => Get.toNamed(
+                  AppRoutes.chat,
+                  arguments: {
+                    'channel': 'lab:${lab.id}',
+                    'labId': lab.id,
+                    'labName': lab.name,
+                  },
                 ),
               ),
             ],
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildDescription(BuildContext context, String description) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'About',
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-            color: Colors.grey[500],
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            color: Theme.of(context).primaryColor.withOpacity(0.03),
-            border: Border.all(
-              color: Theme.of(context).primaryColor.withOpacity(0.08),
-            ),
-          ),
-          child: Text(
-            description,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              height: 1.4,
-              color: Colors.grey[700],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildActionGrid(BuildContext context, LabModel lab) {
-    final actions = [
-      (
-        icon: Icons.event_outlined,
-        label: 'Sessions',
-        route: AppRoutes.sessions,
-        args: lab.id,
-      ),
-      (
-        icon: Icons.bar_chart_outlined,
-        label: 'Grades',
-        route: AppRoutes.grades,
-        args: lab.id,
-      ),
-      (
-        icon: Icons.folder_open_outlined,
-        label: 'Files',
-        route: AppRoutes.files,
-        args: lab.id,
-      ),
-      (
-        icon: Icons.chat_bubble_outline,
-        label: 'Chat',
-        route: AppRoutes.chat,
-        args: {
-          'channel': 'lab:${lab.id}',
-          'labId': lab.id,
-          'labName': lab.name,
-        },
-      ),
-    ];
-
-    return Column(
-      children: [
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-            childAspectRatio: 1,
-          ),
-          itemCount: actions.length,
-          itemBuilder: (context, index) {
-            final action = actions[index];
-            return _buildActionCard(
-              context,
-              action.icon,
-              action.label,
-              () => Get.toNamed(action.route, arguments: action.args),
-            );
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildActionCard(
-    BuildContext context,
-    IconData icon,
-    String label,
-    VoidCallback onTap,
-  ) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: Theme.of(context).cardColor,
-          border: Border.all(
-            color: Theme.of(context).primaryColor.withOpacity(0.08),
-          ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Theme.of(context).primaryColor.withOpacity(0.08),
-              ),
-              child: Icon(
-                icon,
-                color: Theme.of(context).primaryColor,
-                size: 20,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              style: Theme.of(
-                context,
-              ).textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w600),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
       ),
     );
   }

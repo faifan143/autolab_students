@@ -27,7 +27,8 @@ class _SessionStreamingScreenState extends State<SessionStreamingScreen> {
     // Initialize streaming on first load
     if (_sessionId != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!streamingProvider.isLoading && !streamingProvider.isStreaming) {
+        if (!streamingProvider.isLoading &&
+            streamingProvider.shouldAutoLoad(_sessionId!)) {
           streamingProvider.loadStreamingStatus(_sessionId!);
         }
       });
@@ -185,24 +186,29 @@ class _SessionStreamingScreenState extends State<SessionStreamingScreen> {
             child: Stack(
               alignment: Alignment.center,
               children: [
-                // Real WebRTC video view
-                if (provider.remoteRenderer != null && provider.isConnected)
-                  RTCVideoView(
-                    provider.remoteRenderer!,
-                    mirror: false,
-                    objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
-                  )
-                else
-                  // Loading/placeholder while connecting
+                // Always mount the video view once a remote stream is attached;
+                // stacked spinner covers until frames paint.
+                if (provider.remoteRenderer != null &&
+                    provider.hasReceivedOffer)
+                  Positioned.fill(
+                    child: RTCVideoView(
+                      provider.remoteRenderer!,
+                      mirror: false,
+                      objectFit:
+                          RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
+                    ),
+                  ),
+                if (!provider.isConnected)
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const CircularProgressIndicator(color: Colors.white),
                       const SizedBox(height: 16),
                       Text(
-                        provider.hasReceivedOffer
-                            ? 'receiving_stream'.tr
-                            : 'waiting_for_stream'.tr,
+                        provider.connectionStatus ??
+                            (provider.hasReceivedOffer
+                                ? 'receiving_stream'.tr
+                                : 'waiting_for_stream'.tr),
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
                               color: Colors.white,

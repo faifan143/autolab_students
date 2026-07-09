@@ -35,6 +35,10 @@ class ApiEndpoints {
   // Chat
   static const String chatMessages = '/chat/messages';
 
+  // Complaints
+  static const String complaints = '/complaints';
+  static const String myComplaints = '/complaints/me';
+
   // WebSocket
   static const String wsStudents = '/ws/students';
 

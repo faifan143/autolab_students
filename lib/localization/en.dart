@@ -34,6 +34,8 @@ const Map<String, String> enTranslations = {
   'create_account_subtitle': 'Sign up as a student to access your labs',
   'name_required': 'Name is required',
   'already_have_account_login': 'Already have an account? Log in',
+  'confirm_password': 'Confirm Password',
+  'password_mismatch': 'Passwords do not match',
 
   // Home
   'home_dashboard': 'Home Dashboard',
@@ -44,6 +46,7 @@ const Map<String, String> enTranslations = {
   'grades': 'Grades',
   'files': 'Files',
   'chat': 'Chat',
+  'complaints': 'Complaints',
   'settings': 'Settings',
   'see_all': 'See all',
   'greeting_generic': 'Welcome back',
@@ -94,6 +97,28 @@ const Map<String, String> enTranslations = {
   'refresh_qr': 'Refresh QR',
   'expires_at': 'Expires at',
   'attendance_history': 'Attendance History',
+
+  // Complaints
+  'submit_complaint': 'Submit Complaint',
+  'my_complaints': 'My Complaints',
+  'submit_or_track_complaints': 'Submit a complaint or track status',
+  'complaint_description':
+      'Describe your issue clearly. You can submit generally or relate it to a lab.',
+  'related_lab': 'Related Lab',
+  'optional': 'Optional',
+  'general_complaint': 'General complaint (no lab)',
+  'complaint_content': 'Complaint Content',
+  'complaint_content_hint': 'Write at least 10 characters...',
+  'complaint_required': 'Complaint content is required',
+  'complaint_too_short': 'Complaint must be at least 10 characters',
+  'submit_anonymously': 'Submit anonymously',
+  'complaint_submitted': 'Complaint submitted successfully',
+  'no_complaints_yet': 'No complaints yet',
+  'admin_note': 'Admin note',
+  'new': 'New',
+  'in_review': 'In review',
+  'resolved': 'Resolved',
+  'dismissed': 'Dismissed',
 
   // Grades
   'all_grades': 'All Grades',
@@ -148,6 +173,27 @@ const Map<String, String> enTranslations = {
   'enrollment_error': 'Failed to enroll in lab',
   'enrolled_labs': 'Enrolled Labs',
   'available_labs': 'Available Labs',
+  'labs': 'Labs',
+  'labs_sessions_subtitle': 'View scheduled sessions',
+  'labs_grades_subtitle': 'Check your scores',
+  'labs_files_subtitle': 'Shared lab resources',
+  'labs_chat_subtitle': 'Message your class',
+  'search_labs_hint': 'Search labs or teachers...',
+  'loading_labs': 'Loading labs...',
+  'no_labs_found': 'No labs found',
+  'try_different_search': 'Try a different search',
+  'no_labs_available': 'No labs available yet',
+  'loading_sessions': 'Loading sessions...',
+  'no_sessions': 'No sessions',
+  'no_sessions_available': 'No sessions available yet',
+  'live': 'Live',
+  'loading_grades': 'Loading grades...',
+  'no_grades_yet': 'No grades yet',
+  'grades_will_appear': 'Your grades will appear here',
+  'no_grades_found': 'No grades found',
+  'no_grades_for_category': 'No grades for this category',
+  'all': 'All',
+  'close': 'Close',
 
   // Sessions
   'session_details': 'Session Details',
@@ -176,12 +222,18 @@ const Map<String, String> enTranslations = {
   'file_size': 'File Size',
   'created_at': 'Created At',
   'no_files': 'No files available',
+  'session_recording': 'Session recording',
 
   // Chat
   'no_messages': 'No messages yet',
   'chat_history': 'Chat History',
   'chat_no_lab_selected': 'Please select a lab to view chat',
   'go_back': 'Go Back',
+  'today': 'Today',
+  'yesterday': 'Yesterday',
+  'unknown': 'Unknown',
+  'invalid_ip': 'Please enter a valid IPv4 address',
+  'invalid_port': 'Please enter a valid port (1-65535)',
 
   // General / auth status
   'checking_authentication': 'Checking authentication...',

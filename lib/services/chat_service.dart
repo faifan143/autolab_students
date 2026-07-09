@@ -28,7 +28,7 @@ class ChatService {
 
   /// Get WebSocket path
   static String _getWsPath() {
-    return '/ws/chat';
+    return '/ws/teachers';
   }
 
   /// Connect WebSocket (alias for initializeSocket for spec compatibility)
@@ -67,7 +67,7 @@ class ChatService {
       _socket = null;
     }
 
-    // Build WebSocket URL
+    // Match teachers app flow: connect directly to namespace URL.
     final wsUrl = '$baseUrl${_getWsPath()}';
     ChatLogger.logConnectionAttempt(wsUrl, tokenPreview);
 
@@ -77,8 +77,11 @@ class ChatService {
           .setTransports(['websocket'])
           .setExtraHeaders({'Authorization': 'Bearer $cleanToken'})
           .setAuth({'token': cleanToken})
-          .setQuery({'token': cleanToken})
-          .setTimeout(10000) // 10 seconds timeout
+          .enableForceNew()
+          .enableReconnection()
+          .setReconnectionAttempts(5)
+          .setReconnectionDelay(1000)
+          .setTimeout(10000)
           .build(),
     );
 
@@ -217,7 +220,7 @@ class ChatService {
   }
 
   /// Send a message
-  static void sendMessage({
+  static bool sendMessage({
     required String channel,
     String? content,
     String? labId,
@@ -228,7 +231,7 @@ class ChatService {
       if (_onError != null) {
         _onError!('Socket not connected');
       }
-      return;
+      return false;
     }
 
     // Validation: message must have content OR at least one fileId
@@ -238,7 +241,7 @@ class ChatService {
       if (_onError != null) {
         _onError!('Message must have content or at least one file');
       }
-      return;
+      return false;
     }
 
     // Max 10 files
@@ -247,7 +250,7 @@ class ChatService {
       if (_onError != null) {
         _onError!('Maximum 10 files allowed per message');
       }
-      return;
+      return false;
     }
 
     ChatLogger.logMessageSend(channel, content, labId, fileIds);
@@ -269,6 +272,49 @@ class ChatService {
     }
 
     _socket!.emit('send-message', payload);
+    return true;
+  }
+
+  /// Ensure socket is connected.
+  static Future<bool> ensureConnected({
+    required String channel,
+    String? labId,
+    int timeoutMs = 6000,
+  }) async {
+    if (isConnected) return true;
+
+    try {
+      await initializeSocket(channel, labId: labId);
+    } catch (_) {
+      return false;
+    }
+
+    final sw = Stopwatch()..start();
+    while (sw.elapsedMilliseconds < timeoutMs) {
+      if (isConnected) {
+        return true;
+      }
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+    }
+    return isConnected;
+  }
+
+  /// Send message via REST API (backend-supported flow).
+  static Future<ChatMessageModel> sendMessageRest({
+    required String channel,
+    required String content,
+    String? labId,
+  }) async {
+    final dio = await ApiService.dio;
+    final response = await dio.post(
+      ApiEndpoints.chatMessages,
+      data: {
+        'channel': channel,
+        'content': content.trim(),
+        if (labId != null) 'labId': labId,
+      },
+    );
+    return ChatMessageModel.fromJson(response.data as Map<String, dynamic>);
   }
 
   /// Get chat messages via REST API

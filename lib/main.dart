@@ -16,6 +16,7 @@ import 'providers/grades_provider.dart';
 import 'providers/files_provider.dart';
 import 'providers/chat_provider.dart';
 import 'providers/streaming_provider.dart';
+import 'providers/complaints_provider.dart';
 import 'services/firebase_notifications_service.dart';
 
 void main() async {
@@ -56,13 +57,32 @@ class AutoLabStudentsApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => FilesProvider()),
         ChangeNotifierProvider(create: (_) => ChatProvider()),
         ChangeNotifierProvider(create: (_) => StreamingProvider()),
+        ChangeNotifierProvider(create: (_) => ComplaintsProvider()),
       ],
       child: GetMaterialApp(
         navigatorKey: AppRoutes.navigatorKey,
         title: 'app_title'.tr,
         debugShowCheckedModeBanner: false,
-        theme: AppTheme.lightTheme,
-        darkTheme: AppTheme.darkTheme,
+        builder: (context, child) {
+          return SafeArea(
+            top: false,
+            child: child ?? const SizedBox.shrink(),
+          );
+        },
+        theme: Get.locale?.languageCode == 'ar'
+            ? AppTheme.lightTheme.copyWith(
+                textTheme: AppTheme.lightTheme.textTheme.apply(
+                  fontFamily: 'Cairo',
+                ),
+              )
+            : AppTheme.lightTheme,
+        darkTheme: Get.locale?.languageCode == 'ar'
+            ? AppTheme.darkTheme.copyWith(
+                textTheme: AppTheme.darkTheme.textTheme.apply(
+                  fontFamily: 'Cairo',
+                ),
+              )
+            : AppTheme.darkTheme,
         themeMode: themeController.themeMode.value,
         locale: localeController.locale.value,
         fallbackLocale: const Locale('en'),

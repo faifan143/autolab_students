@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import '../../providers/sessions_provider.dart';
+import 'package:provider/provider.dart';
+
 import '../../models/lab_model.dart';
+import '../../providers/sessions_provider.dart';
 import '../../routes/app_routes.dart';
+import '../../widgets/app_cards.dart';
 
 class SessionsListScreen extends StatefulWidget {
   const SessionsListScreen({super.key});
@@ -25,108 +27,51 @@ class _SessionsListScreenState extends State<SessionsListScreen> {
       _labId = args;
     } else if (args is LabModel) {
       _labId = args.id;
+    } else if (args is Map<String, dynamic>) {
+      _labId = args['labId'] as String?;
     }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!_hasInitialized && mounted && _labId != null) {
         _hasInitialized = true;
-        final sessionsProvider = Provider.of<SessionsProvider>(
-          context,
-          listen: false,
-        );
-        sessionsProvider.loadLabSessions(_labId!);
+        context.read<SessionsProvider>().loadLabSessions(_labId!);
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final sessionsProvider = Provider.of<SessionsProvider>(context);
+    final sessionsProvider = context.watch<SessionsProvider>();
+    final theme = Theme.of(context);
+    final color = theme.colorScheme;
 
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            _buildHeader(context),
-            Expanded(child: _buildContent(context, sessionsProvider)),
-          ],
-        ),
+      appBar: AppBar(
+        automaticallyImplyLeading: true,
+        title: Text('sessions'.tr),
       ),
-    );
-  }
-
-  Widget _buildHeader(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      color: Theme.of(context).scaffoldBackgroundColor,
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: () => Get.back(),
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                Icons.arrow_back,
-                color: Theme.of(context).primaryColor,
-                size: 20,
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Sessions',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.5,
-                ),
-              ),
-              Text(
-                'Lab sessions',
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: Colors.grey[500],
-                  letterSpacing: 0.3,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
+      body: _buildContent(context, sessionsProvider, theme, color),
     );
   }
 
   Widget _buildContent(
     BuildContext context,
     SessionsProvider sessionsProvider,
+    ThemeData theme,
+    ColorScheme color,
   ) {
     if (sessionsProvider.isLoading && sessionsProvider.sessions.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizedBox(
-              width: 48,
-              height: 48,
-              child: CircularProgressIndicator(
-                strokeWidth: 2.5,
-                valueColor: AlwaysStoppedAnimation(
-                  Theme.of(context).primaryColor,
-                ),
-              ),
-            ),
+            const CircularProgressIndicator(),
             const SizedBox(height: 12),
             Text(
-              'Loading sessions...',
-              style: Theme.of(
-                context,
-              ).textTheme.labelMedium?.copyWith(color: Colors.grey[500]),
+              'loading_sessions'.tr,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: color.onSurfaceVariant,
+              ),
             ),
           ],
         ),
@@ -138,30 +83,39 @@ class _SessionsListScreenState extends State<SessionsListScreen> {
         onRefresh: _labId != null
             ? () => sessionsProvider.loadLabSessions(_labId!)
             : () async {},
-        child: Center(
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.event_outlined, size: 48, color: Colors.grey[300]),
-                const SizedBox(height: 12),
-                Text(
-                  'No Sessions',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: [
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.5,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.event_outlined,
+                      size: 48,
+                      color: color.onSurfaceVariant,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'no_sessions'.tr,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'no_sessions_available'.tr,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: color.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  'No sessions available yet',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.labelSmall?.copyWith(color: Colors.grey[500]),
-                ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       );
     }
@@ -170,143 +124,91 @@ class _SessionsListScreenState extends State<SessionsListScreen> {
       onRefresh: _labId != null
           ? () => sessionsProvider.loadLabSessions(_labId!)
           : () async {},
-      color: Theme.of(context).primaryColor,
-      child: ListView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      child: ListView.separated(
+        padding: const EdgeInsets.all(16),
         itemCount: sessionsProvider.sessions.length,
+        separatorBuilder: (_, __) => const SizedBox(height: 12),
         itemBuilder: (context, index) {
           final session = sessionsProvider.sessions[index];
-          return _buildSessionCard(context, session);
+          return _SessionCard(session: session);
         },
       ),
     );
   }
+}
 
-  Widget _buildSessionCard(BuildContext context, dynamic session) {
+class _SessionCard extends StatelessWidget {
+  final dynamic session;
+
+  const _SessionCard({required this.session});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = theme.colorScheme;
     final isStreaming = session.isStreaming ?? false;
-    final dateTime = session.startTime;
-    final date = DateFormat('MMM dd').format(dateTime);
+    final dateTime = session.startTime as DateTime;
+    final date = DateFormat('MMM dd, yyyy').format(dateTime);
     final time = DateFormat('HH:mm').format(dateTime);
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: GestureDetector(
-        onTap: () {
-          Get.toNamed(AppRoutes.sessionDetail, arguments: session.id);
-        },
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            color: Theme.of(context).cardColor,
-            border: Border.all(
-              color: Theme.of(context).primaryColor.withOpacity(0.08),
-              width: 1,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.02),
-                blurRadius: 4,
-                offset: const Offset(0, 1),
-              ),
-            ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
+    return AppSurfaceCard(
+      onTap: () => Get.toNamed(AppRoutes.sessionDetail, arguments: session.id),
+      child: Row(
+        children: [
+          const AppIconBadge(icon: Icons.event_outlined),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Date/Time Icon
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Theme.of(context).primaryColor.withOpacity(0.1),
-                  ),
-                  child: Center(
-                    child: Icon(
-                      Icons.event_outlined,
-                      color: Theme.of(context).primaryColor,
-                      size: 20,
-                    ),
+                Text(
+                  date,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
-                const SizedBox(width: 12),
-                // Date/Time & Status
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        date,
-                        style: Theme.of(context).textTheme.labelMedium
-                            ?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 0.1,
-                            ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.access_time_outlined,
+                      size: 14,
+                      color: color.onSurfaceVariant,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      time,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: color.onSurfaceVariant,
                       ),
-                      const SizedBox(height: 2),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.access_time_outlined,
-                            size: 11,
-                            color: Colors.grey[400],
+                    ),
+                    if (isStreaming) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: color.errorContainer,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          'live'.tr,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: color.onErrorContainer,
+                            fontWeight: FontWeight.w700,
                           ),
-                          const SizedBox(width: 3),
-                          Text(
-                            time,
-                            style: Theme.of(context).textTheme.labelSmall
-                                ?.copyWith(color: Colors.grey[500]),
-                          ),
-                          if (isStreaming) ...[
-                            const SizedBox(width: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.red[100],
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Container(
-                                    width: 4,
-                                    height: 4,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Colors.red[600],
-                                    ),
-                                  ),
-                                  const SizedBox(width: 3),
-                                  Text(
-                                    'Live',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .labelSmall
-                                        ?.copyWith(
-                                          color: Colors.red[600],
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 10,
-                                        ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ],
+                        ),
                       ),
                     ],
-                  ),
+                  ],
                 ),
-                const SizedBox(width: 8),
-                // Arrow
-                Icon(Icons.chevron_right, color: Colors.grey[300], size: 20),
               ],
             ),
           ),
-        ),
+          Icon(Icons.chevron_right, color: color.onSurfaceVariant),
+        ],
       ),
     );
   }

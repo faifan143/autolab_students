@@ -75,7 +75,25 @@ class _StudentQrScreenState extends State<StudentQrScreen> {
                 child: provider.isLoading && token == null
                     ? const CircularProgressIndicator()
                     : token == null
-                        ? Text(provider.error ?? 'attendance_qr_error'.tr)
+                        ? Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.error_outline,
+                                  size: 56,
+                                  color: Colors.grey,
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  provider.error ?? 'attendance_qr_error'.tr,
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context).textTheme.bodyLarge,
+                                ),
+                              ],
+                            ),
+                          )
                         : Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(

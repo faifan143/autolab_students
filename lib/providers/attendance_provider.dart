@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import '../models/attendance_model.dart';
 import '../services/attendance_service.dart';
+import '../utils/api_error_utils.dart';
 
 class AttendanceProvider extends ChangeNotifier {
   bool isLoading = false;
@@ -19,7 +20,7 @@ class AttendanceProvider extends ChangeNotifier {
       isLoading = false;
       notifyListeners();
     } catch (e) {
-      error = e.toString();
+      error = ApiErrorUtils.message(e, fallback: 'Failed to load attendance');
       isLoading = false;
       notifyListeners();
     }
@@ -38,7 +39,10 @@ class AttendanceProvider extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      error = e.toString();
+      error = ApiErrorUtils.message(
+        e,
+        fallback: 'Could not load attendance QR',
+      );
       checkInToken = null;
       checkInExpiresAt = null;
       isLoading = false;

@@ -34,6 +34,8 @@ const Map<String, String> arTranslations = {
   'create_account_subtitle': 'سجل كطالب للوصول إلى معاملك',
   'name_required': 'الاسم مطلوب',
   'already_have_account_login': 'لديك حساب بالفعل؟ سجّل الدخول',
+  'confirm_password': 'تأكيد كلمة المرور',
+  'password_mismatch': 'كلمتا المرور غير متطابقتين',
 
   // Home
   'home_dashboard': 'الصفحة الرئيسية',
@@ -44,6 +46,7 @@ const Map<String, String> arTranslations = {
   'grades': 'الدرجات',
   'files': 'الملفات',
   'chat': 'المحادثة',
+  'complaints': 'الشكاوى',
   'settings': 'الإعدادات',
   'see_all': 'عرض الكل',
   'greeting_generic': 'مرحباً بعودتك',
@@ -94,6 +97,28 @@ const Map<String, String> arTranslations = {
   'refresh_qr': 'تحديث الرمز',
   'expires_at': 'ينتهي في',
   'attendance_history': 'سجل الحضور',
+
+  // Complaints
+  'submit_complaint': 'إرسال شكوى',
+  'my_complaints': 'شكاواي',
+  'submit_or_track_complaints': 'قدّم شكوى أو تابع حالتها',
+  'complaint_description':
+      'اشرح المشكلة بوضوح. يمكنك إرسال شكوى عامة أو ربطها بمعمل.',
+  'related_lab': 'المعمل المرتبط',
+  'optional': 'اختياري',
+  'general_complaint': 'شكوى عامة (بدون معمل)',
+  'complaint_content': 'محتوى الشكوى',
+  'complaint_content_hint': 'اكتب 10 أحرف على الأقل...',
+  'complaint_required': 'محتوى الشكوى مطلوب',
+  'complaint_too_short': 'يجب أن تكون الشكوى 10 أحرف على الأقل',
+  'submit_anonymously': 'إرسال بشكل مجهول',
+  'complaint_submitted': 'تم إرسال الشكوى بنجاح',
+  'no_complaints_yet': 'لا توجد شكاوى بعد',
+  'admin_note': 'ملاحظة الإدارة',
+  'new': 'جديدة',
+  'in_review': 'قيد المراجعة',
+  'resolved': 'تم الحل',
+  'dismissed': 'مرفوضة',
 
   // Grades
   'all_grades': 'كل الدرجات',
@@ -147,6 +172,27 @@ const Map<String, String> arTranslations = {
   'enrollment_error': 'فشل التسجيل في المعمل',
   'enrolled_labs': 'المعامل المسجلة',
   'available_labs': 'المعامل المتاحة',
+  'labs': 'المعامل',
+  'labs_sessions_subtitle': 'عرض الجلسات المجدولة',
+  'labs_grades_subtitle': 'اطّلع على درجاتك',
+  'labs_files_subtitle': 'ملفات المعمل المشتركة',
+  'labs_chat_subtitle': 'تواصل مع صفك',
+  'search_labs_hint': 'ابحث عن المعامل أو المعلمين...',
+  'loading_labs': 'جاري تحميل المعامل...',
+  'no_labs_found': 'لم يتم العثور على معامل',
+  'try_different_search': 'جرّب بحثاً مختلفاً',
+  'no_labs_available': 'لا توجد معامل متاحة بعد',
+  'loading_sessions': 'جاري تحميل الجلسات...',
+  'no_sessions': 'لا توجد جلسات',
+  'no_sessions_available': 'لا توجد جلسات متاحة بعد',
+  'live': 'مباشر',
+  'loading_grades': 'جاري تحميل الدرجات...',
+  'no_grades_yet': 'لا توجد درجات بعد',
+  'grades_will_appear': 'ستظهر درجاتك هنا',
+  'no_grades_found': 'لم يتم العثور على درجات',
+  'no_grades_for_category': 'لا توجد درجات لهذه الفئة',
+  'all': 'الكل',
+  'close': 'إغلاق',
 
   // Sessions
   'session_details': 'تفاصيل الجلسة',
@@ -175,12 +221,18 @@ const Map<String, String> arTranslations = {
   'file_size': 'حجم الملف',
   'created_at': 'تاريخ الإنشاء',
   'no_files': 'لا توجد ملفات',
+  'session_recording': 'تسجيل الجلسة',
 
   // Chat
   'no_messages': 'لا توجد رسائل بعد',
   'chat_history': 'سجل المحادثة',
   'chat_no_lab_selected': 'يرجى اختيار معمل لعرض المحادثة',
   'go_back': 'رجوع',
+  'today': 'اليوم',
+  'yesterday': 'أمس',
+  'unknown': 'غير معروف',
+  'invalid_ip': 'يرجى إدخال عنوان IPv4 صحيح',
+  'invalid_port': 'يرجى إدخال منفذ صحيح (1-65535)',
 
   // General / auth status
   'checking_authentication': 'جارٍ التحقق من المصادقة...',

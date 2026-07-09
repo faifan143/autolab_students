@@ -15,22 +15,26 @@ class StreamingProvider extends ChangeNotifier {
   Map<String, dynamic>? streamOffer;
   String? connectionStatus;
   RTCVideoRenderer? remoteRenderer;
+  bool _initializedForSession = false;
+  String? _activeSessionId;
 
   /// Load streaming status and initialize WebSocket connection
   Future<void> loadStreamingStatus(String sessionId) async {
     isLoading = true;
     error = null;
     connectionStatus = 'connecting'.tr;
+    _activeSessionId = sessionId;
     notifyListeners();
 
     try {
-      // Load session status
-      currentSession = await StreamingService.getSessionStreamingStatus(sessionId);
+      currentSession =
+          await StreamingService.getSessionStreamingStatus(sessionId);
       isStreaming = currentSession?.isStreaming ?? false;
 
-      // Initialize WebSocket connection for streaming
       if (isStreaming) {
         await _initializeStreamingConnection(sessionId);
+      } else {
+        connectionStatus = 'waiting_for_stream'.tr;
       }
 
       isLoading = false;
@@ -43,27 +47,43 @@ class StreamingProvider extends ChangeNotifier {
     }
   }
 
-  /// Initialize WebSocket connection and listen for streamOffer
+  /// Initialize mediasoup SFU consumer against `/ws/streaming`
   Future<void> _initializeStreamingConnection(String sessionId) async {
     try {
-      // Initialize WebRTC peer connection
-      await WebRTCService.initializePeerConnection();
-
-      // Initialize video renderer
       remoteRenderer = await WebRTCService.initializeRenderer();
 
-      // Set callbacks
       WebRTCService.setOnRemoteStreamReady((renderer) {
+        final alreadyReady =
+            hasReceivedOffer && identical(remoteRenderer, renderer);
         remoteRenderer = renderer;
         hasReceivedOffer = true;
         isConnected = true;
         connectionStatus = 'stream_connected'.tr;
-        notifyListeners();
+        // Avoid rebuild storms that recreate EglRenderer and drop frames.
+        if (!alreadyReady) {
+          notifyListeners();
+        }
       });
 
       WebRTCService.setOnConnectionStateChanged((state) {
-        connectionStatus = state;
-        isConnected = state == 'RTCPeerConnectionStateConnected';
+        if (state == 'stream_connected') {
+          connectionStatus = 'stream_connected'.tr;
+          isConnected = true;
+        } else if (state == 'receiving_stream') {
+          connectionStatus = 'receiving_stream'.tr;
+        } else if (state == 'stream_ended') {
+          isStreaming = false;
+          hasReceivedOffer = false;
+          isConnected = false;
+          connectionStatus = 'stream_not_available'.tr;
+        } else if (state == 'failed' ||
+            state == 'disconnected' ||
+            state == 'closed') {
+          isConnected = false;
+          connectionStatus = state;
+        } else {
+          connectionStatus = state;
+        }
         notifyListeners();
       });
 
@@ -73,10 +93,10 @@ class StreamingProvider extends ChangeNotifier {
         notifyListeners();
       });
 
-      // Initialize WebSocket signaling
       await WebRTCService.initializeSignaling(sessionId);
 
       connectionStatus = 'waiting_for_stream'.tr;
+      _initializedForSession = true;
       notifyListeners();
     } catch (e) {
       error = e.toString();
@@ -92,7 +112,13 @@ class StreamingProvider extends ChangeNotifier {
     isConnected = false;
     streamOffer = null;
     remoteRenderer = null;
+    error = null;
+    _initializedForSession = false;
     await loadStreamingStatus(sessionId);
+  }
+
+  bool shouldAutoLoad(String sessionId) {
+    return !_initializedForSession || _activeSessionId != sessionId;
   }
 
   @override
@@ -102,5 +128,3 @@ class StreamingProvider extends ChangeNotifier {
     super.dispose();
   }
 }
-
-

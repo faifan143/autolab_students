@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../services/api_service.dart';
@@ -45,14 +46,41 @@ class _IpConfigDialogState extends State<IpConfigDialog> {
   }
 
   Future<void> _saveConfig() async {
+    bool validIpPart(String value) {
+      final n = int.tryParse(value);
+      return n != null && n >= 0 && n <= 255;
+    }
+
+    final p1 = _segment1Controller.text.trim();
+    final p2 = _segment2Controller.text.trim();
+    final p3 = _segment3Controller.text.trim();
+    final p4 = _segment4Controller.text.trim();
+    final portText = _portController.text.trim();
+    final port = int.tryParse(portText);
+
+    if (!validIpPart(p1) ||
+        !validIpPart(p2) ||
+        !validIpPart(p3) ||
+        !validIpPart(p4)) {
+      Get.snackbar('error'.tr, 'invalid_ip'.tr, snackPosition: SnackPosition.BOTTOM);
+      return;
+    }
+    if (port == null || port < 1 || port > 65535) {
+      Get.snackbar(
+        'error'.tr,
+        'invalid_port'.tr,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
 
     try {
-      final ip =
-          '${_segment1Controller.text.trim()}.${_segment2Controller.text.trim()}.${_segment3Controller.text.trim()}.${_segment4Controller.text.trim()}';
+      final ip = '$p1.$p2.$p3.$p4';
 
       await StorageService.saveServerIp(ip);
-      await StorageService.saveServerPort(_portController.text.trim());
+      await StorageService.saveServerPort(portText);
 
       // Reinitialize Dio with new base URL
       await ApiService.reinitialize();
@@ -96,41 +124,50 @@ class _IpConfigDialogState extends State<IpConfigDialog> {
 
     return AlertDialog(
       backgroundColor: theme.colorScheme.surface,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
       title: Text('server_configuration'.tr),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'server_configuration_description'.tr,
-            style: theme.textTheme.bodySmall,
-          ),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      content: SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 420),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildIpSegmentField(_segment1Controller, hint: '192'),
-              const Text('.'),
-              _buildIpSegmentField(_segment2Controller, hint: '168'),
-              const Text('.'),
-              _buildIpSegmentField(_segment3Controller, hint: '0'),
-              const Text('.'),
-              _buildIpSegmentField(_segment4Controller, hint: '11'),
+              Text(
+                'server_configuration_description'.tr,
+                style: theme.textTheme.bodySmall,
+              ),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 6,
+                runSpacing: 8,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  _buildIpSegmentField(_segment1Controller, hint: '192'),
+                  const Text('.'),
+                  _buildIpSegmentField(_segment2Controller, hint: '168'),
+                  const Text('.'),
+                  _buildIpSegmentField(_segment3Controller, hint: '0'),
+                  const Text('.'),
+                  _buildIpSegmentField(_segment4Controller, hint: '11'),
+                ],
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _portController,
+                decoration: InputDecoration(
+                  labelText: 'port'.tr,
+                  hintText: '3000',
+                ),
+                keyboardType: TextInputType.number,
+              ),
             ],
           ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _portController,
-            decoration: InputDecoration(
-              labelText: 'port'.tr,
-              hintText: '3000',
-            ),
-            keyboardType: TextInputType.number,
-          ),
-        ],
+        ),
       ),
       actions: [
         TextButton(
@@ -153,15 +190,19 @@ class _IpConfigDialogState extends State<IpConfigDialog> {
 
   Widget _buildIpSegmentField(TextEditingController controller, {required String hint}) {
     return SizedBox(
-      width: 56,
+      width: 52,
       child: TextField(
         controller: controller,
         textAlign: TextAlign.center,
         decoration: InputDecoration(
           hintText: hint,
+          isDense: true,
         ),
         keyboardType: TextInputType.number,
-        maxLength: 3,
+        inputFormatters: [
+          FilteringTextInputFormatter.digitsOnly,
+          LengthLimitingTextInputFormatter(3),
+        ],
       ),
     );
   }

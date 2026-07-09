@@ -32,6 +32,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   String? _channel;
   String? _labId;
+  String? _sessionId;
   String? _labName;
 
   @override
@@ -44,11 +45,14 @@ class _ChatScreenState extends State<ChatScreen> {
     });
 
     // Get arguments from route
-    final args = Get.arguments as Map<String, dynamic>?;
-    if (args != null) {
+    final args = Get.arguments;
+    if (args is Map<String, dynamic>) {
       _channel = args['channel'] as String?;
       _labId = args['labId'] as String?;
-      _labName = args['labName'] as String?;
+      _sessionId = args['sessionId'] as String?;
+      _labName = args['labName'] as String? ?? args['title'] as String?;
+    } else if (args is String) {
+      _channel = args;
     }
 
     // Initialize chat provider
@@ -62,6 +66,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   void dispose() {
+    context.read<ChatProvider>().leaveCurrentChannel();
     _controller.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -107,7 +112,11 @@ class _ChatScreenState extends State<ChatScreen> {
 
     try {
       for (var file in _selectedFiles) {
-        final fileModel = await filesProvider.uploadFile(file, labId: _labId);
+        final fileModel = await filesProvider.uploadFile(
+          file,
+          labId: _labId,
+          sessionId: _sessionId,
+        );
 
         if (fileModel != null) {
           _uploadedFileIds.add(fileModel.id);
@@ -130,13 +139,24 @@ class _ChatScreenState extends State<ChatScreen> {
     // Upload files if any
     if (_selectedFiles.isNotEmpty) {
       await _uploadFiles();
+      if (!mounted) return;
     }
 
     final chatProvider = context.read<ChatProvider>();
-    chatProvider.sendMessage(
+    final sent = await chatProvider.sendMessage(
       content: content.isEmpty ? null : content,
       fileIds: _uploadedFileIds.isEmpty ? null : _uploadedFileIds,
     );
+    if (!sent || chatProvider.error != null) {
+      if (mounted) {
+        Get.snackbar(
+          'error'.tr,
+          chatProvider.error ?? 'chat.error'.tr,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+      return;
+    }
 
     // Clear input
     _controller.clear();
@@ -166,6 +186,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: true,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -317,7 +338,7 @@ class _EmptyChatView extends StatelessWidget {
           Icon(
             Icons.forum_outlined,
             size: 64,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha:0.5),
           ),
           const SizedBox(height: 16),
           Text('chat.empty'.tr, style: Theme.of(context).textTheme.titleMedium),
@@ -421,9 +442,9 @@ class _DateSeparator extends StatelessWidget {
 
     String dateText;
     if (_isSameDay(date, today)) {
-      dateText = 'Today';
+      dateText = 'today'.tr;
     } else if (_isSameDay(date, yesterday)) {
-      dateText = 'Yesterday';
+      dateText = 'yesterday'.tr;
     } else {
       dateText = DateFormat('MMM dd, yyyy').format(date);
     }
@@ -544,7 +565,7 @@ class _MessageBubble extends StatelessWidget {
                               ? Colors.white70
                               : Theme.of(
                                   context,
-                                ).colorScheme.onSurface.withOpacity(0.6),
+                                ).colorScheme.onSurface.withValues(alpha:0.6),
                         ),
                       ),
                     ),
@@ -739,7 +760,7 @@ class _MessageFileAttachmentState extends State<_MessageFileAttachment> {
           color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+            color: Theme.of(context).colorScheme.outline.withValues(alpha:0.2),
           ),
         ),
         child: isImage && _fileUrl != null && !_isLoading

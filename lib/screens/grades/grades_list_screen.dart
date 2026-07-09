@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import '../../providers/grades_provider.dart';
 import '../../models/lab_model.dart';
+import '../../widgets/app_cards.dart';
 
 class GradesListScreen extends StatefulWidget {
   const GradesListScreen({super.key});
@@ -32,6 +33,8 @@ class _GradesListScreenState extends State<GradesListScreen> {
       _labId = args;
     } else if (args is LabModel) {
       _labId = args.id;
+    } else if (args is Map<String, dynamic>) {
+      _labId = args['labId'] as String?;
     }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -51,61 +54,17 @@ class _GradesListScreenState extends State<GradesListScreen> {
     final gradesProvider = Provider.of<GradesProvider>(context);
 
     return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: true,
+        title: Text('grades'.tr),
+      ),
       body: SafeArea(
         child: Column(
           children: [
-            _buildHeader(context),
             _buildFilterChips(context),
             Expanded(child: _buildContent(context, gradesProvider)),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildHeader(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      color: Theme.of(context).scaffoldBackgroundColor,
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: () => Get.back(),
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                Icons.arrow_back,
-                color: Theme.of(context).primaryColor,
-                size: 20,
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Grades',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.5,
-                ),
-              ),
-              Text(
-                'View your scores',
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: Colors.grey[500],
-                  letterSpacing: 0.3,
-                ),
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }
@@ -120,7 +79,7 @@ class _GradesListScreenState extends State<GradesListScreen> {
           children: [
             _buildChip(
               context,
-              label: 'All',
+              label: 'all'.tr,
               isSelected: _selectedCategory == null,
               onTap: () => setState(() => _selectedCategory = null),
             ),
@@ -155,12 +114,12 @@ class _GradesListScreenState extends State<GradesListScreen> {
         decoration: BoxDecoration(
           color: isSelected
               ? Theme.of(context).primaryColor
-              : Theme.of(context).primaryColor.withOpacity(0.08),
+              : Theme.of(context).primaryColor.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(18),
           border: isSelected
               ? null
               : Border.all(
-                  color: Theme.of(context).primaryColor.withOpacity(0.2),
+                  color: Theme.of(context).primaryColor.withValues(alpha: 0.2),
                   width: 0.5,
                 ),
         ),
@@ -194,7 +153,7 @@ class _GradesListScreenState extends State<GradesListScreen> {
             ),
             const SizedBox(height: 12),
             Text(
-              'Loading grades...',
+              'loading_grades'.tr,
               style: Theme.of(
                 context,
               ).textTheme.labelMedium?.copyWith(color: Colors.grey[500]),
@@ -220,14 +179,14 @@ class _GradesListScreenState extends State<GradesListScreen> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'No Grades Yet',
+                  'no_grades_yet'.tr,
                   style: Theme.of(
                     context,
                   ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Your grades will appear here',
+                  'grades_will_appear'.tr,
                   style: Theme.of(
                     context,
                   ).textTheme.labelSmall?.copyWith(color: Colors.grey[500]),
@@ -261,7 +220,7 @@ class _GradesListScreenState extends State<GradesListScreen> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'No Grades Found',
+                  'no_grades_found'.tr,
                   style: Theme.of(
                     context,
                   ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
@@ -269,8 +228,8 @@ class _GradesListScreenState extends State<GradesListScreen> {
                 const SizedBox(height: 4),
                 Text(
                   _selectedCategory != null
-                      ? 'No grades for "$_selectedCategory"'
-                      : 'Your grades will appear here',
+                      ? 'no_grades_for_category'.tr
+                      : 'grades_will_appear'.tr,
                   style: Theme.of(
                     context,
                   ).textTheme.labelSmall?.copyWith(color: Colors.grey[500]),
@@ -285,9 +244,10 @@ class _GradesListScreenState extends State<GradesListScreen> {
     return RefreshIndicator(
       onRefresh: () => gradesProvider.loadGrades(labId: _labId),
       color: Theme.of(context).primaryColor,
-      child: ListView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      child: ListView.separated(
+        padding: const EdgeInsets.all(16),
         itemCount: filteredGrades.length,
+        separatorBuilder: (_, __) => const SizedBox(height: 12),
         itemBuilder: (context, index) {
           final grade = filteredGrades[index];
           return _buildGradeCard(context, grade);
@@ -300,31 +260,12 @@ class _GradesListScreenState extends State<GradesListScreen> {
     final percentage = grade.percentage ?? 0.0;
     final color = _getGradeColor(percentage);
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: GestureDetector(
+    return AppSurfaceCard(
         onTap: grade.comment != null
             ? () => _showCommentDialog(context, grade.comment!)
             : null,
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            color: Theme.of(context).cardColor,
-            border: Border.all(
-              color: Theme.of(context).primaryColor.withOpacity(0.08),
-              width: 1,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.02),
-                blurRadius: 4,
-                offset: const Offset(0, 1),
-              ),
-            ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
+        padding: const EdgeInsets.all(12),
+        child: Row(
               children: [
                 // Score Circle
                 Container(
@@ -332,7 +273,7 @@ class _GradesListScreenState extends State<GradesListScreen> {
                   height: 48,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: color.withOpacity(0.12),
+                    color: color.withValues(alpha: 0.12),
                   ),
                   child: Center(
                     child: Text(
@@ -417,9 +358,6 @@ class _GradesListScreenState extends State<GradesListScreen> {
                   ),
               ],
             ),
-          ),
-        ),
-      ),
     );
   }
 
@@ -454,7 +392,7 @@ class _GradesListScreenState extends State<GradesListScreen> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'Comment',
+                    'comment'.tr,
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -483,7 +421,7 @@ class _GradesListScreenState extends State<GradesListScreen> {
                       vertical: 8,
                     ),
                   ),
-                  child: const Text('Close'),
+                  child: Text('close'.tr),
                 ),
               ),
             ],
