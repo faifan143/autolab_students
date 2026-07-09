@@ -302,16 +302,23 @@ class ChatService {
   /// Send message via REST API (backend-supported flow).
   static Future<ChatMessageModel> sendMessageRest({
     required String channel,
-    required String content,
+    String? content,
     String? labId,
+    List<String>? fileIds,
   }) async {
+    final trimmed = content?.trim();
+    if ((trimmed == null || trimmed.isEmpty) &&
+        (fileIds == null || fileIds.isEmpty)) {
+      throw Exception('Message must include content or attachments');
+    }
     final dio = await ApiService.dio;
     final response = await dio.post(
       ApiEndpoints.chatMessages,
       data: {
         'channel': channel,
-        'content': content.trim(),
+        if (trimmed != null && trimmed.isNotEmpty) 'content': trimmed,
         if (labId != null) 'labId': labId,
+        if (fileIds != null && fileIds.isNotEmpty) 'fileIds': fileIds,
       },
     );
     return ChatMessageModel.fromJson(response.data as Map<String, dynamic>);

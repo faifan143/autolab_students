@@ -101,12 +101,7 @@ class ChatProvider extends ChangeNotifier {
     }
 
     final text = (content ?? '').trim();
-    final resolvedContent = text.isNotEmpty
-        ? text
-        : (fileIds != null && fileIds.isNotEmpty
-              ? 'Attachment message (${fileIds.length} file(s))'
-              : '');
-    if (resolvedContent.isEmpty) {
+    if (text.isEmpty && (fileIds == null || fileIds.isEmpty)) {
       error = 'Message cannot be empty';
       notifyListeners();
       return false;
@@ -115,8 +110,9 @@ class ChatProvider extends ChangeNotifier {
     try {
       final created = await ChatService.sendMessageRest(
         channel: currentChannel!,
-        content: resolvedContent,
+        content: text.isEmpty ? null : text,
         labId: currentLabId,
+        fileIds: fileIds,
       );
       if (!_messageIds.contains(created.id)) {
         _messageIds.add(created.id);
