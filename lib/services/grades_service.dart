@@ -14,8 +14,12 @@ class GradesService {
       queryParameters: queryParams,
     );
 
-    final List<dynamic> data = response.data;
-    return data.map((json) => GradeModel.fromJson(json)).toList();
+    final List<dynamic> data = _extractGradesList(response.data);
+    return data
+        .whereType<Map>()
+        .map((json) => _normalizeGradeJson(Map<String, dynamic>.from(json)))
+        .map((json) => GradeModel.fromJson(json))
+        .toList();
   }
 
   /// Get all grades for the current student (legacy method)
@@ -28,5 +32,57 @@ class GradesService {
   @Deprecated('Use getMyGrades(labId: labId) instead')
   static Future<List<GradeModel>> getLabGrades(String labId) async {
     return getMyGrades(labId: labId);
+  }
+
+  static List<dynamic> _extractGradesList(dynamic payload) {
+    if (payload is List) return payload;
+    if (payload is Map) {
+      final map = Map<String, dynamic>.from(payload);
+      final candidates = [map['data'], map['grades'], map['items']];
+      for (final candidate in candidates) {
+        if (candidate is List) return candidate;
+      }
+    }
+    return const [];
+  }
+
+  static Map<String, dynamic> _normalizeGradeJson(Map<String, dynamic> json) {
+    final normalized = Map<String, dynamic>.from(json);
+
+    final labValue = normalized['labId'];
+    if (labValue is Map) {
+      normalized['labId'] = labValue['_id']?.toString() ?? '';
+    } else if (labValue != null) {
+      normalized['labId'] = labValue.toString();
+    } else {
+      normalized['labId'] = '';
+    }
+
+    final studentValue = normalized['studentId'];
+    if (studentValue is String) {
+      normalized['studentId'] = {
+        '_id': studentValue,
+        'name': '',
+        'email': '',
+        'role': 'student',
+      };
+    } else if (studentValue is Map) {
+      final studentMap = Map<String, dynamic>.from(studentValue);
+      normalized['studentId'] = {
+        '_id': (studentMap['_id'] ?? '').toString(),
+        'name': (studentMap['name'] ?? '').toString(),
+        'email': (studentMap['email'] ?? '').toString(),
+        'role': (studentMap['role'] ?? 'student').toString(),
+      };
+    }
+
+    if (normalized['category'] == null || normalized['category'] == '') {
+      normalized['category'] = 'Grade';
+    }
+
+    normalized['score'] = (normalized['score'] as num?)?.toDouble() ?? 0.0;
+    normalized['maxScore'] = (normalized['maxScore'] as num?)?.toDouble();
+
+    return normalized;
   }
 }

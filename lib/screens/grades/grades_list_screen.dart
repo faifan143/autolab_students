@@ -136,6 +136,41 @@ class _GradesListScreenState extends State<GradesListScreen> {
   }
 
   Widget _buildContent(BuildContext context, GradesProvider gradesProvider) {
+    if (gradesProvider.error != null && gradesProvider.grades.isEmpty) {
+      return RefreshIndicator(
+        onRefresh: () => gradesProvider.loadGrades(labId: _labId),
+        child: Center(
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.error_outline, size: 48, color: Colors.red[300]),
+                const SizedBox(height: 12),
+                Text(
+                  'Failed to load grades',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 6),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Text(
+                    gradesProvider.error!,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(
+                      context,
+                    ).textTheme.labelSmall?.copyWith(color: Colors.grey[600]),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     if (gradesProvider.isLoading && gradesProvider.grades.isEmpty) {
       return Center(
         child: Column(
